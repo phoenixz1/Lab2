@@ -1,6 +1,15 @@
 import java.net.*;
 import java.io.*;
 
+
+/*
+TODO: 1.Handle Fire Events
+	  2.Handle client exit/"bye" (remove thread from 'clients', 
+	  								everything else done on client side)
+	  3.Might need a dedicated thread for broadcasts
+*/
+
+
 public class MazewarServerHandlerThread extends Thread {
 	private Socket socket = null;
 

@@ -15,7 +15,7 @@ public class MazewarPacket implements Serializable {
 	
 	/* send your message here */
 	public String cID;
-	public keyEvent event;	
+	public KeyEvent event;	
 
 	/* send your message here */
 	public String message;
