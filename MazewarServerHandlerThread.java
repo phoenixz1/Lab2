@@ -1,77 +1,49 @@
 import java.net.*;
 import java.io.*;
-
-
-/*
-TODO: 1.Handle Fire Events
-	  2.Handle client exit/"bye" (remove thread from 'clients', 
-	  								everything else done on client side)
-	  3.Might need a dedicated thread for broadcasts
-*/
+import java.util.*;
 
 
 public class MazewarServerHandlerThread extends Thread {
-	private Socket socket = null;
+	
+ 	public int tID;	
+	public Socket socket = null;
+	public ObjectOutputStream toClient;
+	private Queue<MazewarPacket> inQueue;
+	private Map<Integer, MazewarServerHandlerThread> clients;
 
-	public MazewarServerHandlerThread(Socket socket) {
+	
+	public MazewarServerHandlerThread
+			(int tID, Socket socket, Queue<MazewarPacket> incomingQueue, Map<Integer, MazewarServerHandlerThread> clients) 
+	{
 		super("MazewarServerHandlerThread");
+		this.tID = tID;
 		this.socket = socket;
-		System.out.println("Created new Thread to handle client");
+		this.inQueue = incomingQueue;
+		this.clients = clients;
+		System.out.println("Created new Thread to handle client; tID = "+ tID);
 	}
 	
-	// enqueue the request package and multicast top of the queue 
 	
-	public void broadcast() {
-		//while(serverIncomingQueue.size() == 0) {;} //keep polling
-		if(serverIncomingQueue.size() != 0) {
-			Packet currPacket = serverIncomingQueue.remove();
-			for (MazewarServerHandlerThread t : clients) {
-        			t.send(currPacket);
-    			}
-		}
-	}
-
-
-	public void send(Packet packetFromQueue) {
-		/* stream to write back to client */
-		ObjectOutputStream toClient = new ObjectOutputStream(socket.getOutputStream());
-		
-		/* create a packet to send to client */
-		MazewarPacket packetToClient = new MazewarPacket();
-		packetToClient.type = MazewarPacket.MW_REPLY;
-
-		if(packetFromClient.type == MazewarPacket.MW_REQUEST) {
-			packetToClient.message = packetFromQueue.message;
-			packetToClient.cID = packetFromQueue.cID;
-			packetToClient.event = packetFromQueue.event;
-			/* send reply back to client */
-			toClient.writeObject(packetToClient);	
-		}
-
-	}
 
 
 	public void run() {
 
 		boolean gotByePacket = false;
-		
 		try {
 			/* stream to read from client */
 			ObjectInputStream fromClient = new ObjectInputStream(socket.getInputStream());
+			/* stream to write back to client */
+			toClient = new ObjectOutputStream(socket.getOutputStream());			
 			MazewarPacket packetFromClient;
+			MazewarPacket packetToClient = new MazewarPacket();
 
 			while (( packetFromClient = (MazewarPacket) fromClient.readObject()) != null) {				
 				
 				/* process message */
 				/* add to package global queue */
 				if(packetFromClient.type == MazewarPacket.MW_REQUEST) {
-					
-					serverIncomingQueue.add(packetFromClient);
+					inQueue.add(packetFromClient);
 					System.out.println("From Client "+ packetFromClient.cID +" : "+ packetFromClient.message);
-				
-					/* send a broadcast */
-					broadcast();
-					
 					/* wait for next packet */
 					continue;
 				}
@@ -83,8 +55,7 @@ public class MazewarServerHandlerThread extends Thread {
 					packetToClient.type = MazewarPacket.MW_BYE;
 					packetToClient.message = "Bye!";
 					packetToClient.cID = packetFromClient.cID;
-					serverIncomingQueue.add(packetToClient);
-					broadcast();
+					inQueue.add(packetToClient);
 					break;
 				}
 				
@@ -97,6 +68,7 @@ public class MazewarServerHandlerThread extends Thread {
 			fromClient.close();
 			toClient.close();
 			socket.close();
+			clients.remove(tID);
 
 		} catch (IOException e) {
 			if(!gotByePacket)
@@ -105,5 +77,34 @@ public class MazewarServerHandlerThread extends Thread {
 			if(!gotByePacket)
 				e.printStackTrace();
 		}
+	}
+
+
+	public void send(MazewarPacket packetFromQueue) {
+	   try {
+		/* stream to write back to client */
+		//ObjectOutputStream toClient = new ObjectOutputStream(socket.getOutputStream());
+		
+		/* create a packet to send to client */
+		MazewarPacket packetToClient = new MazewarPacket();		
+
+		if(packetFromQueue.type == MazewarPacket.MW_REQUEST) {	
+			packetToClient.message = packetFromQueue.message;
+			packetToClient.cID = packetFromQueue.cID;
+			packetToClient.event = packetFromQueue.event;
+			packetToClient.type = MazewarPacket.MW_REPLY;
+		}
+		else if(packetFromQueue.type == MazewarPacket.MW_JOIN) {
+			packetToClient.message = packetFromQueue.message;
+			packetToClient.cID = packetFromQueue.cID;
+			packetToClient.type = MazewarPacket.MW_JOIN;
+			}		
+	
+		/* send reply back to client */
+		toClient.writeObject(packetToClient);
+	    }
+	    catch (IOException e) {
+			e.printStackTrace();
+	    }
 	}
 }
