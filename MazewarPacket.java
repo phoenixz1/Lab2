@@ -9,6 +9,7 @@ public class MazewarPacket implements Serializable {
 	public static final int MW_REQUEST     = 200;
 	public static final int MW_REPLY       = 300;
 	public static final int MW_BYE         = 400;
+	public static final int MW_START       = 500;
 	
 	/* the packet payload */
 	
