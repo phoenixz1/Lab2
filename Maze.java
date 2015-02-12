@@ -103,6 +103,14 @@ public abstract class Maze {
      */
     public abstract Iterator getClients();
     
+    /**
+     * Add a remote client to the maze in a given location with a given orientation
+     * @param client Client to be added to the maze
+     * @param point The point at which the remote client will spawn
+     * @param dir The starting orientation of the client
+     */
+    public abstract void addRemoteClient(Client client, Point point, Direction dir);
+    
     /* Maze Listeners ******************************************************/
 
     /** 
