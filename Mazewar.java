@@ -138,15 +138,47 @@ public class Mazewar extends JFrame {
                   Mazewar.quit();
                 }
                 
-                // Create the GUI client
+                // Connect local client to the server, and obtain info about remote clients from the server
+                int NumPlayers = 3; // Total number of other players needed to play the Mazewar game
+                
+                //Create an array of RemoteClients to add remote players into the maze
+                RemoteClient RemotePlayers;
+                
+                int NumConnected = 0; // Number of other players connected to the Mazewar server
+                
                 String serv_hostname = host; // Machine that hosts the server
                 int serv_port = port_num; // Port number of the server
                 int localType = 25; // GUI client is a local type
+                
+                // Initialise a socket that listens for player details from the server
+                Socket PlayerSock = new Socket(serv_hostname, serv_port);
+                
+                // Input and output streams for the socket
+                ObjectInputStream FromServ = new ObjectInputStream(PlayerSock.getInputStream());
+                
+                // Packet that will contain info about a player connecting to the server
+                MazewarPacket PackFromServ;
+                
+                // Create the GUI client
                 guiClient = new GUIClient(name,localType,host,port_num);
                 maze.addClient(guiClient);
                 this.addKeyListener(guiClient);
                 guiClient.clients.put(guiClient.getName(), guiClient);
                 guiClient.joinOtherClients();
+                
+                while((NumConnected < NumPlayers) && ((PackFromServ = (MazewarPacket) FromServ.readObject()) != null)){
+                   if(PackFromServ.type == MazewarPacket.MW_JOIN && PackFromServ.Player != guiClient.getName()){
+                      RemotePlayers = new RemoteClient(PackFromServ.Player);
+                      maze.addClient(RemotePlayers);
+                      this.addKeyListener(RemotePlayers);
+                      guiClient.clients.put(RemotePlayers.getName(), RemotePlayers);
+                      NumConnected++;
+                      continue;
+                   }
+                   else if(PackFromServ.type = MazewarPaccket.MW_START){
+                      break;
+                   }
+                }
                 
                 // Use braces to force constructors not to be called at the beginning of the
                 // constructor.
