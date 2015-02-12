@@ -167,7 +167,7 @@ public class Mazewar extends JFrame {
                 guiClient = new GUIClient(name,host,port_num);
                 maze.addClient(guiClient);
                 this.addKeyListener(guiClient);
-                guiClient.addClientToMap(guiClient.getName(), guiClient);
+                guiClient.clients.put(guiClient.getName(), guiClient);
                 
                 // Set the fields for the PackToServ packet
                 PackToServ.Player = guiClient.getName();
@@ -183,7 +183,7 @@ public class Mazewar extends JFrame {
                       RemotePlayers[NumConnected] = new RemoteClient(PackFromServ.Player);
                       maze.addClient(RemotePlayers[NumConnected]);
                       this.addKeyListener(RemotePlayers[NumConnected]);
-                      guiClient.addClientToMap(RemotePlayers[NumConnected].getName(), RemotePlayers[NumConnected]);
+                      guiClient.clients.put(RemotePlayers[NumConnected].getName(), RemotePlayers[NumConnected]);
                       NumConnected++;
                       continue;
                    }
