@@ -30,62 +30,51 @@ USA.
 
 public abstract class LocalClient extends Client {
 
+		    // queue to store the incoming packets from server
+				public static final Queue<MazewarPacket> inQueue = new LinkedList<MazewarPacket>();
+				 
+				// map of containing active players on maze (Client.name<String> --> <Client Object>)
+				public static final Map<String, Client> clients = new HashMap();
+				
+				// thread to listen from server and enqueue packets
+				ClientReceiverThread enquethread;
+				
+				// thread to dequeue and process packets
+				ClientExecutionThread dequethread;
+				
+				// Host name and port number of the Mazewar server
+				String hostname;
+				int port;
+				
+				// Socket and streams to communicate to the server with
+				Socket mwSocket = null;
+		        ObjectOutputStream outStream = null;
+		        ObjectInputStream inStream = null;
+
         /** 
          * Create a {@link Client} local to this machine.
          * @param name The name of this {@link Client}.
+         * @param hostname The hostname of the the Mazewar server
+         * @param port The port number of the Mazewar server
          */
-        public LocalClient(String name) {
-                super(name);
-                assert(name != null);
-				
-				try {
-                        /* variables for hostname/port */
-                        String hostname = "localhost";
-                        int port = 4444;
-
-                        if(args.length == 2 ) {
-                                hostname = args[0];
-                                port = Integer.parseInt(args[1]);
-                        } else {
-                                System.err.println("ERROR: Invalid arguments!");
-                                System.exit(-1);
-                        }
-                        mwSocket = new Socket(hostname, port);
-
-                        out = new ObjectOutputStream(echoSocket.getOutputStream());
-                        in = new ObjectInputStream(echoSocket.getInputStream());
-
-                } catch (UnknownHostException e) {
-                        System.err.println("ERROR: Don't know where to connect!!");
-                        System.exit(1);
-                } catch (IOException e) {
-                        System.err.println("ERROR: Couldn't get I/O for the connection.");
-                        System.exit(1);
-                }
-				
-				enquethread = new ClientReceiverThread(inQueue, inStream, mwSocket);
-				dequethread = new ClientExecutionThread(inQueue, clients); 
-				enquethread.start();
-				dequethread.start();
+        public LocalClient(String name, String host, int port_num) {
+            super(name);
+            assert(name != null);
+            
+            hostname = host;
+            port = port_num;
+            
+            // Initialize the socket to the server's host name and port #
+            mwSocket = new Socket(hostname,port);
+            
+            inStream = new ObjectInputStream(mwSocket.getInputStream());
+            outStream = new ObjectOutputStream(mwSocket.getOutputStream());
+            
+						enquethread = new ClientReceiverThread(inQueue, inStream, mwSocket);
+						dequethread = new ClientExecutionThread(inQueue, clients); 
+						enquethread.start();
+						dequethread.start();
         }
-
-        // queue to store the incoming packets from server
-		public static final Queue<MazewarPacket> inQueue = new LinkedList<MazewarPacket>();
-		 
-		// map of containing active players on maze (Client.name<String> --> <Client Object>)
-		public static final Map<String, Client> clients = new HashMap();
-		
-		// thread to listen from server and enqueue packets
-		ClientReceiverThread enquethread;
-		
-		// thread to dequeue and process packets
-		ClientExecutionThread dequethread;
-		
-		// Socket and streams to communicate to the server with
-		Socket mwSocket = null;
-        ObjectOutputStream outStream = null;
-        ObjectInputStream inStream = null;
-		
 		
 		/*
 		*  TODO: 1. Send packages to server
