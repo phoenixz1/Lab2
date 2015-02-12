@@ -65,17 +65,10 @@ public class ClientExecutionThread extends Thread {
                                 c.fire();
                         }
 		}
-		else if(pkt.type == MW_JOIN) { // New remote client wants to join the game
-			// Create a new remote client with the given name in the packet
-			RemoteClient newClnt = new RemoteClient(cID, 50);
-			maze.addClient(newClnt);
-			Mazewar.addKeyListener(newClnt);
-			players.put(cID, newClnt);
-		}
 		else if(pkt.tpye == MW_BYE) { // Client wants to quit the game
 			// Remove the client from the hash map of players active in the game and from the maze
 			players.remove(cID);
-			maze.removeClient(c);
+			c.maze.removeClient(c);
 			
 			if(c.getType() == 25) { // Local client is quitting; exit from the Mazewar application
 				Mazewar.quit();
