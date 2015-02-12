@@ -63,15 +63,17 @@ public abstract class LocalClient extends Client {
                         System.exit(1);
                 }
 				
-				enquethread = new ClientReceiverThread(inQueue, inStream);
-				dequethread = new ClientExecutionThread(inQueue); 
+				enquethread = new ClientReceiverThread(inQueue, inStream, mwSocket);
+				dequethread = new ClientExecutionThread(inQueue, clients); 
+				enquethread.start();
+				dequethread.start();
         }
 
         // queue to store the incoming packets from server
 		public static final Queue<MazewarPacket> inQueue = new LinkedList<MazewarPacket>();
 		 
 		// map of containing active players on maze (Client.name<String> --> <Client Object>)
-		public static final Map<String, MazewarServerHandlerThread> clients = new HashMap();
+		public static final Map<String, Client> clients = new HashMap();
 		
 		// thread to listen from server and enqueue packets
 		ClientReceiverThread enquethread;
@@ -84,14 +86,22 @@ public abstract class LocalClient extends Client {
         ObjectOutputStream outStream = null;
         ObjectInputStream inStream = null;
 		
+		
 		/*
-		*  TODO: 1. Handle commands
+		*  TODO: 1. Send packages to server
 		*			- Create functions to handle key events
 		*			- Create MW_REQUEST package
 		*			- Send to server via "outStream"
-		*        2. Handle Fire events
+		*
+		*		 2. Read and execute packages from queue
+		*			- Modify ClientExecutionThread.java
+		*			- Dequeue package, lookup package.cID in map 'clients'
+		*			- Execute package.KeyEvent on that client
+		*
+		*		 3.	Handle Fire events
 		*			- If a client dies, send MW_INIT package
 		*			  to server for that client
-		*		 3. ???
+		*			
+		*		 4. ???
 		*/
 }

@@ -13,7 +13,7 @@ public class ClientReceiverThread extends Thread {
 	
 	
 	
-	public ClientReceiverThread (Socket socket, Queue<MazewarPacket> incomingQueue, Map<Integer, ObjectInputStream inStream) 
+	public ClientReceiverThread (Socket socket, Queue<MazewarPacket> incomingQueue, ObjectInputStream inStream) 
 	{
 		super("ClientReceiverThread");
 		this.socket = socket;
@@ -28,12 +28,11 @@ public class ClientReceiverThread extends Thread {
 	public void run() {
 		
 		MazewarPacket packetFromServer;
-		while ((packetFromServer = (EchoPacket) inStream.readObject()) != null) {
+		while ((packetFromServer = (MazewarPacket) inStream.readObject()) != null) {
                     inQueue.add(packetFromServer);
                 }
 		// connection ended
         inStream.close();
         socket.close();
 	}
-
 }
