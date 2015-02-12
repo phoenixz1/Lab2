@@ -35,6 +35,7 @@ public class MazewarServer {
 	int threadNum = 0;
 	broadcaster = new MazewarBroadcastThread(threadNum, serverIncomingQueue, clients);
 	ticker = new MazewarTickerThread();
+	broadcaster.start();
 	ticker.start();
         while (listening) { // listen and enqueue
 		threadNum = ++threadNum % MAX_THREADS;
