@@ -17,6 +17,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 USA.
 */
 
+import java.lang.*
+import java.util.*
+import java.io.*
+import java.net.*
+
 /**
  * An abstract class for {@link Client}s in a {@link Maze} that local to the 
  * computer the game is running upon. You may choose to implement some of 
