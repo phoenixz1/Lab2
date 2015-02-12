@@ -141,7 +141,7 @@ public class Mazewar extends JFrame {
                 // Connect local client to the server, and obtain info about remote clients from the server
                 int NumPlayers = 3; // Total number of other players needed to play the Mazewar game
                 
-                //Create an array of RemoteClients to add remote players into the maze
+                //A RemoteClient to add remote players into the maze
                 RemoteClient RemotePlayers;
                 
                 int NumConnected = 0; // Number of other players connected to the Mazewar server
@@ -179,6 +179,10 @@ public class Mazewar extends JFrame {
                       break;
                    }
                 }
+                
+                // Some cleanup
+                FromServ.close();
+                PlayerSock.close();
                 
                 // Use braces to force constructors not to be called at the beginning of the
                 // constructor.
