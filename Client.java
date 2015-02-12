@@ -58,6 +58,14 @@ public abstract class Client {
         public String getName() {
                 return name;
         }
+        
+        /**
+         * Get the type of this {@link Client}.
+         * @return A {@link int} indicating the {@link Client}'s type
+         */
+        public int getType() {
+                return type;
+        }
       
         /**
          * Obtain the location of this {@link Client}.
@@ -113,13 +121,27 @@ public abstract class Client {
          * Name of the client.
          */
         private String name = null;
+        
+        /**
+         * Types of client playing the game
+         * 3 types: local (25), remote (50), robot(75)
+         */
+         protected static final int LOCAL = 25;
+         protected static final int REMOTE = 50;
+         protected static final int ROBOT = 75;
+         
+         /**
+          * Type of client
+          */
+         private int type = 0;
        
         /** 
-         * Create a new client with the specified name.
+         * Create a new client with the specified name and type.
          */
-        protected Client(String name) {
+        protected Client(String name, int ctype) {
                 assert(name != null);
                 this.name = name;
+                this.type = ctype;
         }
 
         /**
