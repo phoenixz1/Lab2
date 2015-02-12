@@ -169,7 +169,7 @@ public class Mazewar extends JFrame {
                 while((NumConnected < NumPlayers) && ((PackFromServ = (MazewarPacket) FromServ.readObject()) != null)){
                    if(PackFromServ.type == MazewarPacket.MW_JOIN && PackFromServ.Player != guiClient.getName()){
                       RemotePlayers = new RemoteClient(PackFromServ.Player);
-                      maze.addClient(RemotePlayers);
+                      maze.addRemoteClient(RemotePlayers);
                       this.addKeyListener(RemotePlayers);
                       guiClient.clients.put(RemotePlayers.getName(), RemotePlayers);
                       NumConnected++;
