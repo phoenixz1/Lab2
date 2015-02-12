@@ -70,7 +70,7 @@ public abstract class LocalClient extends Client {
             inStream = new ObjectInputStream(mwSocket.getInputStream());
             outStream = new ObjectOutputStream(mwSocket.getOutputStream());
             
-						enquethread = new ClientReceiverThread(inQueue, inStream, mwSocket);
+						enquethread = new ClientReceiverThread(mwSocket, inQueue, inStream);
 						dequethread = new ClientExecutionThread(inQueue, clients); 
 						enquethread.start();
 						dequethread.start();
