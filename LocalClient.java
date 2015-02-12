@@ -37,14 +37,61 @@ public abstract class LocalClient extends Client {
         public LocalClient(String name) {
                 super(name);
                 assert(name != null);
-		// start enquethread
-		// start dequethread
+				
+				try {
+                        /* variables for hostname/port */
+                        String hostname = "localhost";
+                        int port = 4444;
+
+                        if(args.length == 2 ) {
+                                hostname = args[0];
+                                port = Integer.parseInt(args[1]);
+                        } else {
+                                System.err.println("ERROR: Invalid arguments!");
+                                System.exit(-1);
+                        }
+                        mwSocket = new Socket(hostname, port);
+
+                        out = new ObjectOutputStream(echoSocket.getOutputStream());
+                        in = new ObjectInputStream(echoSocket.getInputStream());
+
+                } catch (UnknownHostException e) {
+                        System.err.println("ERROR: Don't know where to connect!!");
+                        System.exit(1);
+                } catch (IOException e) {
+                        System.err.println("ERROR: Couldn't get I/O for the connection.");
+                        System.exit(1);
+                }
+				
+				enquethread = new ClientReceiverThread(inQueue, inStream);
+				dequethread = new ClientExecutionThread(inQueue); 
         }
 
-        /**
-         * Fill in here??
-         */
-
-
-
+        // queue to store the incoming packets from server
+		public static final Queue<MazewarPacket> inQueue = new LinkedList<MazewarPacket>();
+		 
+		// map of containing active players on maze (Client.name<String> --> <Client Object>)
+		public static final Map<String, MazewarServerHandlerThread> clients = new HashMap();
+		
+		// thread to listen from server and enqueue packets
+		ClientReceiverThread enquethread;
+		
+		// thread to dequeue and process packets
+		ClientExecutionThread dequethread;
+		
+		// Socket and streams to communicate to the server with
+		Socket mwSocket = null;
+        ObjectOutputStream outStream = null;
+        ObjectInputStream inStream = null;
+		
+		/*
+		*  TODO: 1. Handle commands
+		*			- Create functions to handle key events
+		*			- Create MW_REQUEST package
+		*			- Send to server via "outStream"
+		*        2. Handle Fire events
+		*			- If a client dies, send MW_INIT package
+		*			  to server for that client
+		*		 3. ???
+		*/
 }
