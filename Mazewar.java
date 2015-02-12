@@ -119,7 +119,7 @@ public class Mazewar extends JFrame {
         /** 
          * The place where all the pieces are put together. 
          */
-        public Mazewar() {
+        public Mazewar(String host, int port_num) {
                 super("ECE419 Mazewar");
                 consolePrintLn("ECE419 Mazewar started!");
                 
@@ -146,8 +146,8 @@ public class Mazewar extends JFrame {
                 RemoteClient[] RemotePlayers = new RemoteClient[NumPlayers];
                 
                 int NumConnected = 0; // Number of other players connected to the Mazewar server
-                String serv_hostname = "ug149"; // Machine that hosts the server
-                int serv_port = 8000; // Port number of the server
+                String serv_hostname = host; // Machine that hosts the server
+                int serv_port = port; // Port number of the server
                 
                 // Initialise a socket that listens for player details from the server
                 Socket PlayerSock = new Socket(serv_hostname, serv_port);
@@ -270,8 +270,14 @@ public class Mazewar extends JFrame {
          * @param args Command-line arguments.
          */
         public static void main(String args[]) {
-
+                String hostname;
+                int port;
+                
+                if(args.length == 2){
+                   hostname = args[0];
+                   port = Integer.parseInt(args[1]);
+                }
                 /* Create the GUI */
-                new Mazewar();
+                new Mazewar(hostname,port);
         }
 }
