@@ -2,6 +2,8 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 import java.net.*;
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
 
 public class ClientExecutionThread extends Thread {
 	
@@ -26,7 +28,7 @@ public class ClientExecutionThread extends Thread {
 		
 		// poll inQueue for packets, read packet, executePacket()
 		while(true){
-			if(inQueue.element == null) { // Nothing is in the queue
+			if(inQueue.element() == null) { // Nothing is in the queue
 				break;
 			}
 			
@@ -40,7 +42,7 @@ public class ClientExecutionThread extends Thread {
 	
 	public void executePacket(MazewarPacket pkt) {
 	
-		String cID = pkt.cID;
+		String cID = pkt.Player;
 		Client c = players.get(cID);
 		assert(c != null);
 		
@@ -65,7 +67,7 @@ public class ClientExecutionThread extends Thread {
                                 c.fire();
                         }
 		}
-		else if(pkt.tpye == MW_BYE) { // Client wants to quit the game
+		else if(pkt.type == MW_BYE) { // Client wants to quit the game
 			// Remove the client from the hash map of players active in the game and from the maze
 			players.remove(cID);
 			c.maze.removeClient(c);
@@ -74,7 +76,7 @@ public class ClientExecutionThread extends Thread {
 				Mazewar.quit();
 			}
 		}
-		else if(pkt.type == MW_TIK){
+		else if(pkt.type == MW_TICK){
 			c.maze.missiletick();
 		}
 		else { // Other types have no actions
