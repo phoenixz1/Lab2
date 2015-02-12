@@ -29,8 +29,8 @@ public class RemoteClient extends Client {
          * Create a remotely controlled {@link Client}.
          * @param name Name of this {@link RemoteClient}.
          */
-        public RemoteClient(String name) {
-                super(name);
+        public RemoteClient(String name, int type) {
+                super(name, type);
         }
 
         /**
