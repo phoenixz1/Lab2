@@ -326,13 +326,18 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                         rotateClientRight(c);
                 }
         }
+        
+        public void run(){
+        	
+        }
 
         /**
          * Control loop for {@link Projectile}s.
          */
-        public void run() {
+        public void missiletick() {
+        	//following action was done in a forever loop, with 200ms pause.
+        	//now it's based on server's request
                 Collection deadPrj = new HashSet();
-                while(true) {
                         if(!projectileMap.isEmpty()) {
                                 Iterator it = projectileMap.keySet().iterator();
                                 synchronized(projectileMap) {
@@ -352,13 +357,8 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                                         deadPrj.clear();
                                 }
                         }
-                        try {
-                                thread.sleep(200);
-                        } catch(Exception e) {
-                                // shouldn't happen
-                        }
-                }
         }
+        
         
         /* Internals */
         

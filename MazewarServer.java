@@ -13,6 +13,8 @@ public class MazewarServer {
     public static final Map<Integer, MazewarServerHandlerThread> clients = new HashMap();
 
     private static MazewarBroadcastThread broadcaster;
+    
+    private static MazewarTickerThread ticker;
 
 
     public static void main(String[] args) throws IOException {
@@ -32,6 +34,8 @@ public class MazewarServer {
 
 	int threadNum = 0;
 	broadcaster = new MazewarBroadcastThread(threadNum, serverIncomingQueue, clients);
+	ticker = new MazewarTickerThread();
+	ticker.start();
         while (listening) { // listen and enqueue
 		threadNum = ++threadNum % MAX_THREADS;
         	MazewarServerHandlerThread client = 
@@ -42,3 +46,14 @@ public class MazewarServer {
         serverSocket.close();
     }
 }
+
+public class MazewarTickerThread()extends Thread{
+	public void run(){
+		//send signal to all clients to move local bullets
+		try{
+			Thread.sleep(200);
+		}catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+} 

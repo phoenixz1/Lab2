@@ -126,7 +126,6 @@ public class Mazewar extends JFrame {
                 // Create the maze
                 maze = new MazeImpl(new Point(mazeWidth, mazeHeight), mazeSeed);
                 assert(maze != null);
-                
                 // Have the ScoreTableModel listen to the maze to find
                 // out how to adjust scores.
                 ScoreTableModel scoreModel = new ScoreTableModel();
