@@ -42,7 +42,7 @@ public class ClientExecutionThread extends Thread {
 	
 	public void executePacket(MazewarPacket pkt) {
 	
-		String cID = pkt.cID;
+		String cID = pkt.Player;
 		Client c = players.get(cID);
 		assert(c != null);
 		

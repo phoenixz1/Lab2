@@ -43,6 +43,7 @@ public class MazewarServerHandlerThread extends Thread {
 				/* add to package global queue */
 				if(packetFromClient.type == MazewarPacket.MW_REQUEST) {
 					inQueue.add(packetFromClient);
+					System.out.println("From Client "+ packetFromClient.cID +" : "+ packetFromClient.message);
 					/* wait for next packet */
 					continue;
 				}
@@ -51,6 +52,7 @@ public class MazewarServerHandlerThread extends Thread {
 				if (packetFromClient.type == MazewarPacket.MW_NULL || packetFromClient.type == MazewarPacket.MW_BYE) {
 					gotByePacket = true;
 					packetToClient.type = MazewarPacket.MW_BYE;
+					packetToClient.message = "Bye!";
 					packetToClient.cID = packetFromClient.cID;
 					inQueue.add(packetToClient);
 					break;
@@ -86,11 +88,13 @@ public class MazewarServerHandlerThread extends Thread {
 		MazewarPacket packetToClient = new MazewarPacket();		
 
 		if(packetFromQueue.type == MazewarPacket.MW_REQUEST) {	
+			packetToClient.message = packetFromQueue.message;
 			packetToClient.cID = packetFromQueue.cID;
 			packetToClient.event = packetFromQueue.event;
 			packetToClient.type = MazewarPacket.MW_REPLY;
 		}
 		else if(packetFromQueue.type == MazewarPacket.MW_JOIN) {
+			packetToClient.message = packetFromQueue.message;
 			packetToClient.cID = packetFromQueue.cID;
 			packetToClient.type = MazewarPacket.MW_JOIN;
 			}		

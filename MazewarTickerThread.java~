@@ -40,7 +40,6 @@ public class MazewarTickerThread extends Thread{
 	public void broadcast(MazewarPacket currPacket) {
 
 		Set<Integer> s = clients.keySet();
-		System.out.println("Broadcasting packet type: "+currPacket.type);
 		for(int tid : s) {
 			MazewarServerHandlerThread t = clients.get(tid);
        			t.send(currPacket);

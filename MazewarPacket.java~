@@ -18,7 +18,7 @@ public class MazewarPacket implements Serializable {
 	public int type = MW_NULL;
 	
 	// Client name
-	public String cID;
+	public String Player;
 	
 	// Key event
 	public KeyEvent event = null;	

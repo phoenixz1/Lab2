@@ -110,8 +110,6 @@ public abstract class Maze {
      * @param dir The starting orientation of the client
      */
     public abstract void addRemoteClient(Client client, Point point, Direction dir);
-
-    public abstract void missiletick();
     
     /* Maze Listeners ******************************************************/
 

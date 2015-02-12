@@ -14,9 +14,9 @@ CAT=cat
 
 # The only file we are interested in is Mazewar.class,
 # the rest are handled by the dependencies.
-FILES=Mazewar.class MazewarServerHandlerThread.class MazewarBroadcastThread.class MazewarPacket.class MazewarServer.class MazewarTickerThread.class ClientExecutionThread.class ClientReceiverThread.class
+FILES=Mazewar.class MazewarServerHandlerThread.class MazewarBroadcastThread.class MazewarPacket.class MazewarServer.class MazewarTickerThread.class
 
-all: ${FILES} MazewarServer.java MazewarPacket.java MazewarServerHandlerThread.java MazewarBroadcastThread.java MazewarTickerThread.java ClientExecutionThread.java ClientReceiverThread.java
+all: ${FILES} MazewarServer.java MazewarPacket.java MazewarServerHandlerThread.java MazewarBroadcastThread.java MazewarTickerThread.java
 	${JAVA_HOME}/bin/javac *.java
 
 # Rule for making classes.

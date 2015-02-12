@@ -68,23 +68,17 @@ public abstract class LocalClient extends Client {
             
             hostname = host;
             port = port_num;
-            try {
-            	// Initialize the socket to the server's host name and port #
-            	mwSocket = new Socket(hostname,port);
             
-            	inStream = new ObjectInputStream(mwSocket.getInputStream());
-            	outStream = new ObjectOutputStream(mwSocket.getOutputStream());
-            } catch (UnknownHostException e) {
-		System.err.println("ERROR: Don't know where to connect!!");
-		System.exit(1);
-	    } catch (IOException e) {
-		System.err.println("ERROR: Couldn't get I/O for the connection.");
-		System.exit(1);
-	    }
-	    enquethread = new ClientReceiverThread(mwSocket, inQueue, inStream);
-	    dequethread = new ClientExecutionThread(inQueue, clients); 
-	    enquethread.start();
-	    dequethread.start();
+            // Initialize the socket to the server's host name and port #
+            mwSocket = new Socket(host,port);
+            
+            inStream = new ObjectInputStream(mwSocket.getInputStream());
+            outStream = new ObjectOutputStream(mwSocket.getOutputStream());
+            
+						enquethread = new ClientReceiverThread(mwSocket, inQueue, inStream);
+						dequethread = new ClientExecutionThread(inQueue, clients); 
+						enquethread.start();
+						dequethread.start();
         }
 		
 		/*

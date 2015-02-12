@@ -16,8 +16,6 @@ public class MazewarServer {
     
     private static MazewarTickerThread ticker;
 
-    private static int threadNum = 0;
-
 
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = null;
@@ -34,8 +32,9 @@ public class MazewarServer {
             System.exit(-1);
         }
 
+	int threadNum = 0;
 	broadcaster = new MazewarBroadcastThread(threadNum, serverIncomingQueue, clients);
-	ticker = new MazewarTickerThread(clients, threadNum);
+	ticker = new MazewarTickerThread(clients);
 	broadcaster.start();
 	ticker.start();
         while (listening) { // listen and enqueue

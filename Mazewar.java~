@@ -159,8 +159,6 @@ public class Mazewar extends JFrame {
 		        // Initialise a socket that listens for player details from the server
 		        Socket PlayerSock = new Socket(serv_hostname, serv_port);
 		        
-			System.out.println("Socket created.");
-
 		        // Input and output streams for the socket
 		        ObjectInputStream FromServ = new ObjectInputStream(PlayerSock.getInputStream());
                 	

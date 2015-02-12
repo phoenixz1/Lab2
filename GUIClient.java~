@@ -44,7 +44,7 @@ public class GUIClient extends LocalClient implements KeyListener {
         public void keyPressed(KeyEvent e) {
                 //Create a new packet to be sent out to the server
                 MazewarPacket outPkt = new MazewarPacket();
-                outPkt.cID = this.getName();
+                outPkt.Player = this.getName();
                 outPkt.event = e;
                 
                 if((e.getKeyChar() == 'q') || (e.getKeyChar() == 'Q')) {
@@ -84,7 +84,7 @@ public class GUIClient extends LocalClient implements KeyListener {
               // Create a packet to send to the server
               MazewarPacket pktToServ = new MazewarPacket();
               pktToServ.type = MazewarPacket.MW_JOIN;
-              pktToServ.cID = this.getName();
+              pktToServ.Player = this.getName();
               pktToServ.StartPoint = this.getPoint();
               pktToServ.dir = this.getOrientation();
               
