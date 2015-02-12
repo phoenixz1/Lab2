@@ -47,13 +47,3 @@ public class MazewarServer {
     }
 }
 
-public class MazewarTickerThread()extends Thread{
-	public void run(){
-		//send signal to all clients to move local bullets
-		try{
-			Thread.sleep(200);
-		}catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-} 
