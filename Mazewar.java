@@ -147,7 +147,7 @@ public class Mazewar extends JFrame {
                 
                 int NumConnected = 0; // Number of other players connected to the Mazewar server
                 String serv_hostname = host; // Machine that hosts the server
-                int serv_port = port; // Port number of the server
+                int serv_port = port_num; // Port number of the server
                 
                 // Initialise a socket that listens for player details from the server
                 Socket PlayerSock = new Socket(serv_hostname, serv_port);
@@ -164,7 +164,7 @@ public class Mazewar extends JFrame {
                 MazewarPacket PackToServ = new MazewarPacket();
                 
                 // Create the GUIClient
-                guiClient = new GUIClient(name);
+                guiClient = new GUIClient(name,host,port_num);
                 maze.addClient(guiClient);
                 this.addKeyListener(guiClient);
                 
