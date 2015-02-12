@@ -3,7 +3,7 @@ import java.util.*;
 public class MazewarTickerThread()extends Thread{
 	
 	public MazewarTickerThread(){
-		
+		super("MazewarServerHandlerThread");
 	}
 	
 	public void run(){

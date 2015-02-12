@@ -51,7 +51,6 @@ public class MazewarServerHandlerThread extends Thread {
 				/* Sending an MW_NULL || MW_BYE means quit */
 				if (packetFromClient.type == MazewarPacket.MW_NULL || packetFromClient.type == MazewarPacket.MW_BYE) {
 					gotByePacket = true;
-					packetToClient = new MazewarPacket();
 					packetToClient.type = MazewarPacket.MW_BYE;
 					packetToClient.message = "Bye!";
 					packetToClient.cID = packetFromClient.cID;
