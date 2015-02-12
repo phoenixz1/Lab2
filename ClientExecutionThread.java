@@ -74,6 +74,9 @@ public class ClientExecutionThread extends Thread {
 				Mazewar.quit();
 			}
 		}
+		else if(pkt.type == MW_TIK){
+			c.maze.missiletick();
+		}
 		else { // Other types have no actions
 			return;
 		}
