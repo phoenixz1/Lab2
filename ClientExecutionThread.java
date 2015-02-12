@@ -25,10 +25,16 @@ public class ClientExecutionThread extends Thread {
 	public void run() {
 		
 		// poll inQueue for packets, read packet, executePacket()
-		MazewarPacket head = inQueue.remove();
-		
-		if(head != null){
-			executePacket(head);
+		while(true){
+			if(inQueue.element == null) { // Nothing is in the queue
+				break;
+			}
+			
+			MazewarPacket head = inQueue.remove();
+			
+			if(head != null) {
+				executePacket(head);
+			}
 		}
     }
 	
@@ -36,21 +42,14 @@ public class ClientExecutionThread extends Thread {
 	
 		String cID = pkt.cID;
 		Client c = players.get(cID);
+		assert(c != null);
 		
-		if(pkt.type == MW_REPLY) {
+		if(pkt.type == MW_REPLY) { // Client event to process
 			KeyEvent e = pkt.event;
 			// c.execute_command(e);
 			
-                        // If the user pressed Q, invoke the cleanup code and quit. 
-                        if((e.getKeyChar() == 'q') || (e.getKeyChar() == 'Q')) {
-                                if(c.getType() = 100){ // Local client
-                                        Mazewar.quit();
-                                }
-                                else { // Remote client
-                                        // TODO: Remove the remote client from the hash map and maze
-                                }
                         // Up-arrow moves forward.
-                        } else if(e.getKeyCode() == KeyEvent.VK_UP) {
+                        if(e.getKeyCode() == KeyEvent.VK_UP) {
                                 c.forward();
                         // Down-arrow moves backward.
                         } else if(e.getKeyCode() == KeyEvent.VK_DOWN) {
@@ -66,9 +65,24 @@ public class ClientExecutionThread extends Thread {
                                 c.fire();
                         }
 		}
-		else {
-			// fill this for all remaining packet types
-		
+		else if(pkt.type == MW_JOIN) { // New remote client wants to join the game
+			// Create a new remote client with the given name in the packet
+			RemoteClient newClnt = new RemoteClient(cID, 50);
+			maze.addClient(newClnt);
+			Mazewar.addKeyListener(newClnt);
+			players.put(cID, newClnt);
+		}
+		else if(pkt.tpye == MW_BYE) { // Client wants to quit the game
+			// Remove the client from the hash map of players active in the game and from the maze
+			players.remove(cID);
+			maze.removeClient(c);
+			
+			if(c.getType() == 25) { // Local client is quitting; exit from the Mazewar application
+				Mazewar.quit();
+			}
+		}
+		else { // Other types have no actions
+			return;
 		}
 	}
 
