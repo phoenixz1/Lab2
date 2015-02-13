@@ -25,5 +25,6 @@ public class MazewarPacket implements Serializable {
 
 	// Client's starting position & orientation
 	public Point StartPoint = null;
-	public Direction dir = null;
+	public String dir = null;
+
 };

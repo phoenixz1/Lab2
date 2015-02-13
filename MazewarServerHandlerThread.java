@@ -31,9 +31,10 @@ public class MazewarServerHandlerThread extends Thread {
 		boolean gotByePacket = false;
 		try {
 			/* stream to read from client */
-			ObjectInputStream fromClient = new ObjectInputStream(socket.getInputStream());
+
 			/* stream to write back to client */
-			toClient = new ObjectOutputStream(socket.getOutputStream());			
+			toClient = new ObjectOutputStream(socket.getOutputStream());	
+			ObjectInputStream fromClient = new ObjectInputStream(socket.getInputStream());		
 			MazewarPacket packetFromClient;
 			MazewarPacket packetToClient = new MazewarPacket();
 
@@ -41,7 +42,8 @@ public class MazewarServerHandlerThread extends Thread {
 				
 				/* process message */
 				/* add to package global queue */
-				if(packetFromClient.type == MazewarPacket.MW_REQUEST) {
+				if(packetFromClient.type == MazewarPacket.MW_REQUEST || packetFromClient.type == MazewarPacket.MW_JOIN) 
+				{
 					inQueue.add(packetFromClient);
 					/* wait for next packet */
 					continue;
@@ -93,7 +95,8 @@ public class MazewarServerHandlerThread extends Thread {
 		else if(packetFromQueue.type == MazewarPacket.MW_JOIN) {
 			packetToClient.cID = packetFromQueue.cID;
 			packetToClient.type = MazewarPacket.MW_JOIN;
-			}		
+		}
+		
 	
 		/* send reply back to client */
 		toClient.writeObject(packetToClient);

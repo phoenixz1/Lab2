@@ -35,26 +35,26 @@ import java.net.*;
 
 public abstract class LocalClient extends Client {
 
-		    // queue to store the incoming packets from server
-				public static final Queue<MazewarPacket> inQueue = new LinkedList<MazewarPacket>();
-				 
-				// map of containing active players on maze (Client.name<String> --> <Client Object>)
-				public static final Map<String, Client> clients = new HashMap();
-				
-				// thread to listen from server and enqueue packets
-				ClientReceiverThread enquethread;
-				
-				// thread to dequeue and process packets
-				ClientExecutionThread dequethread;
-				
-				// Host name and port number of the Mazewar server
-				String hostname;
-				int port;
-				
-				// Socket and streams to communicate to the server with
-				Socket mwSocket = null;
-		        ObjectOutputStream outStream = null;
-		        ObjectInputStream inStream = null;
+	// queue to store the incoming packets from server
+	public static final Queue<MazewarPacket> inQueue = new LinkedList<MazewarPacket>();
+		 
+	// map of containing active players on maze (Client.name<String> --> <Client Object>)
+	public static final Map<String, Client> clients = new HashMap();
+	
+	// thread to listen from server and enqueue packets
+	ClientReceiverThread enquethread;
+		
+	// thread to dequeue and process packets
+	ClientExecutionThread dequethread;
+	
+	// Host name and port number of the Mazewar server
+	String hostname;
+	int port;
+	
+	// Socket and streams to communicate to the server with
+	Socket mwSocket = null;
+        public ObjectOutputStream outStream = null;
+        public ObjectInputStream inStream = null;
 
         /** 
          * Create a {@link Client} local to this machine.
@@ -62,6 +62,7 @@ public abstract class LocalClient extends Client {
          * @param hostname The hostname of the the Mazewar server
          * @param port The port number of the Mazewar server
          */
+
         public LocalClient(String name, int ctype, String host, int port_num) {
             super(name, ctype);
             assert(name != null);
@@ -71,9 +72,12 @@ public abstract class LocalClient extends Client {
             try {
             	// Initialize the socket to the server's host name and port #
             	mwSocket = new Socket(hostname,port);
-            
-            	inStream = new ObjectInputStream(mwSocket.getInputStream());
+
+            	System.out.println("Socket created.");
             	outStream = new ObjectOutputStream(mwSocket.getOutputStream());
+            	inStream = new ObjectInputStream(mwSocket.getInputStream());
+
+		System.out.println("Socket & input stream created.");
             } catch (UnknownHostException e) {
 		System.err.println("ERROR: Don't know where to connect!!");
 		System.exit(1);
@@ -86,6 +90,7 @@ public abstract class LocalClient extends Client {
 	    enquethread.start();
 	    dequethread.start();
         }
+
 		
 		/*
 		*  TODO: 1. Send packages to server

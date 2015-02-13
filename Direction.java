@@ -19,13 +19,14 @@ USA.
   
 import java.util.Random;
 
+
 /**
  * A representation of the for Cardinal Directions with associated utility methods.
  * @author Geoffrey Washburn &lt;<a href="mailto:geoffw@cis.upenn.edu">geoffw@cis.upenn.edu</a>&gt;
  * @version $Id: Direction.java 339 2004-01-23 20:06:22Z geoffw $
  */
 
-public class Direction {
+public class Direction{
         
         /* Internals ******************************************************/
         
@@ -54,6 +55,17 @@ public class Direction {
                 assert((direction >= 0) && (direction < 4));
                 this.direction = direction;
         }
+	public Direction(String string) {
+                if(string == "North")
+			direction = 0;
+		else if(string == "East")
+			direction = 1;
+		else if(string== "South")
+			direction =2;
+		else direction = 3;
+
+                }
+
         
         /**
          * The Northward Cardinal {@link Direction}.

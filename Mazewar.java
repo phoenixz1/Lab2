@@ -29,6 +29,7 @@ import javax.swing.BorderFactory;
 import java.io.Serializable;
 import java.net.*;
 import java.io.*;
+import java.util.Scanner;
 
 /**
  * The entry point and glue code for the game.  It also contains some helpful
@@ -153,34 +154,37 @@ public class Mazewar extends JFrame {
                 int localType = 25; // GUI client is a local type
 
 		System.out.println("Before try block.");
-                
+
 		try {
 			System.out.println("After try block.");
 		        // Initialise a socket that listens for player details from the server
-		        Socket PlayerSock = new Socket(serv_hostname, serv_port);
+		        Socket PlayerSock = null;//new Socket(serv_hostname, serv_port);
 		        
-			System.out.println("Socket created.");
+			//System.out.println("Socket created.");
 
 		        // Input and output streams for the socket
-		        ObjectInputStream FromServ = new ObjectInputStream(PlayerSock.getInputStream());
-                	
-			System.out.println("Socket & input stream created.");
+
+		        //FromServ = new ObjectInputStream(PlayerSock.getInputStream());
+                	//ObjectOutputStream a  = new ObjectOutputStream(PlayerSock.getOutputStream());
+			//System.out.println("Socket & input stream created.");
 
 		        // Packet that will contain info about a player connecting to the server
 		        MazewarPacket PackFromServ;
 		        
 		        // Create the GUI client
 		        guiClient = new GUIClient(name,localType,host,port_num);
+
+			System.out.println("guis");
 		        maze.addClient(guiClient);
 		        this.addKeyListener(guiClient);
 		        guiClient.clients.put(guiClient.getName(), guiClient);
 		        guiClient.joinOtherClients();
 		        System.out.println("going in loop");
-		        while((NumConnected < NumPlayers) && ((PackFromServ = (MazewarPacket) FromServ.readObject()) != null)){
+		        while((NumConnected < NumPlayers) && ((PackFromServ = (MazewarPacket) guiClient.inStream.readObject()) != null)){
 		           System.out.println("in client loop packettype = "+PackFromServ.type);
 			   if(PackFromServ.type == MazewarPacket.MW_JOIN && PackFromServ.cID != guiClient.getName()){
 		              RemotePlayers = new RemoteClient(PackFromServ.cID, 50);
-		              maze.addRemoteClient(RemotePlayers, PackFromServ.StartPoint, PackFromServ.dir);
+		              maze.addRemoteClient(RemotePlayers, PackFromServ.StartPoint, new Direction(PackFromServ.dir));
 		              guiClient.clients.put(RemotePlayers.getName(), RemotePlayers);
 		              NumConnected++;
 		           }
@@ -192,8 +196,8 @@ public class Mazewar extends JFrame {
 		
 		        
 		        // Some cleanup
-		        FromServ.close();
-		        PlayerSock.close();
+		      //  FromServ.close();
+		        //PlayerSock.close();
 
 		} catch (UnknownHostException e) {
 			System.err.println("ERROR: Don't know where to connect!!");

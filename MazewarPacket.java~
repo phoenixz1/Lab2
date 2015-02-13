@@ -1,7 +1,7 @@
 import java.io.Serializable;
 import java.awt.event.KeyEvent;
 
-public class MazewarPacket implements Serializable {
+public class MazewarPacket extends Serializable {
 
 	/* define packet formats */
 	public static final int MW_NULL        = 0;
@@ -18,12 +18,13 @@ public class MazewarPacket implements Serializable {
 	public int type = MW_NULL;
 	
 	// Client name
-	public String Player;
+	public String cID;
 	
 	// Key event
 	public KeyEvent event = null;	
 
 	// Client's starting position & orientation
 	public Point StartPoint = null;
-	public Direction dir = null;
+	public String dir = null;
+
 };

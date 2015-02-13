@@ -28,14 +28,15 @@ public class ClientExecutionThread extends Thread {
 		
 		// poll inQueue for packets, read packet, executePacket()
 		while(true){
-			if(inQueue.element() == null) { // Nothing is in the queue
-				break;
-			}
+			if(inQueue.size() != 0) { // Nothing is in the queue
+				
+			
 			
 			MazewarPacket head = inQueue.remove();
 			
 			if(head != null) {
 				executePacket(head);
+			}
 			}
 		}
     }
