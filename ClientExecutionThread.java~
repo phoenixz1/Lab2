@@ -28,7 +28,9 @@ public class ClientExecutionThread extends Thread {
 		
 		// poll inQueue for packets, read packet, executePacket()
 		while(true){
-			if(inQueue.size() != 0) { // Something is in the queue
+			if(inQueue.size() != 0) { // Nothing is in the queue
+				
+			
 			
 			MazewarPacket head = inQueue.remove();
 			

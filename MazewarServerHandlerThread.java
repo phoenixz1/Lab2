@@ -42,9 +42,11 @@ public class MazewarServerHandlerThread extends Thread {
 				
 				/* process message */
 				/* add to package global queue */
-				if(packetFromClient.type == MazewarPacket.MW_REQUEST || packetFromClient.type == MazewarPacket.MW_JOIN) 
+				if(packetFromClient.type != MazewarPacket.MW_NULL && packetFromClient.type != MazewarPacket.MW_BYE) 
 				{
+					System.out.println("Enqueueuing packet of type "+packetFromClient.type);
 					inQueue.add(packetFromClient);
+					System.out.println("Enqueued");
 					/* wait for next packet */
 					continue;
 				}
@@ -81,10 +83,7 @@ public class MazewarServerHandlerThread extends Thread {
 
 	public void send(MazewarPacket packetFromQueue) {
 	   try {
-		/* stream to write back to client */
-		//ObjectOutputStream toClient = new ObjectOutputStream(socket.getOutputStream());
-		
-		/* create a packet to send to client */
+
 		MazewarPacket packetToClient = new MazewarPacket();		
 
 		if(packetFromQueue.type == MazewarPacket.MW_REQUEST) {	
@@ -96,10 +95,15 @@ public class MazewarServerHandlerThread extends Thread {
 			packetToClient.cID = packetFromQueue.cID;
 			packetToClient.type = MazewarPacket.MW_JOIN;
 		}
-		
+		else {
+			packetToClient.cID = packetFromQueue.cID;
+			packetToClient.type = packetFromQueue.type;
+		}
 	
 		/* send reply back to client */
+		System.out.println("Thread "+tID+" Sending packet to client "+packetFromQueue.cID);
 		toClient.writeObject(packetToClient);
+		System.out.println("Sent.");
 	    }
 	    catch (IOException e) {
 			e.printStackTrace();

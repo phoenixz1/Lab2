@@ -87,29 +87,14 @@ public abstract class LocalClient extends Client {
 	    }
 	    enquethread = new ClientReceiverThread(mwSocket, inQueue, inStream);
 	    dequethread = new ClientExecutionThread(inQueue, clients); 
+
+        }
+
+	public void startthreads(){
 	    enquethread.start();
 	    dequethread.start();
-        }
+}
 
-
-
-	public void joinOtherClients(){
-              // Create a packet to send to the server
-              MazewarPacket pktToServ = new MazewarPacket();
-              pktToServ.type = MazewarPacket.MW_JOIN;
-              pktToServ.cID = this.getName();
-              pktToServ.StartPoint = this.getPoint();
-              //pktToServ.dir = (String) this.getOrientation().toString();
-              
-              // Send the packet through the socket's output stream
-	      try {
-              	outStream.writeObject(pktToServ);
-	      }
-	      catch (IOException e) {
-		 System.err.println("ERROR: Couldn't get I/O for the connection3.");
-		 e.printStackTrace();
-	       }
-        }
 		
 		/*
 		*  TODO: 1. Send packages to server

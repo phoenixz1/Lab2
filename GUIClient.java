@@ -83,15 +83,15 @@ public class GUIClient extends LocalClient implements KeyListener {
         public void joinOtherClients(){
               // Create a packet to send to the server
               MazewarPacket pktToServ = new MazewarPacket();
-	      System.out.println("debug1");
-              pktToServ.type = MazewarPacket.MW_JOIN;System.out.println("debug2");
-              pktToServ.cID = this.getName();System.out.println("debug3");
-              pktToServ.StartPoint = this.getPoint();System.out.println("debug4");
-              pktToServ.dir = (String) this.getOrientation().toString();
+
+              pktToServ.type = MazewarPacket.MW_JOIN;
+              pktToServ.cID = this.getName();
+              pktToServ.StartPoint = this.getPoint();
+              pktToServ.dir =  this.getOrientation().toString();
               
               // Send the packet through the socket's output stream
 	      try {
-		System.out.println("debug5");
+
               	outStream.writeObject(pktToServ);
 	      }
 	      catch (IOException e) {

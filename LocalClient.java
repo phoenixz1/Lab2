@@ -87,9 +87,13 @@ public abstract class LocalClient extends Client {
 	    }
 	    enquethread = new ClientReceiverThread(mwSocket, inQueue, inStream);
 	    dequethread = new ClientExecutionThread(inQueue, clients); 
+
+        }
+
+	public void startthreads(){
 	    enquethread.start();
 	    dequethread.start();
-        }
+	}
 
 		
 		/*

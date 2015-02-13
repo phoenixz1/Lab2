@@ -178,12 +178,16 @@ public class Mazewar extends JFrame {
 		        maze.addClient(guiClient);
 		        this.addKeyListener(guiClient);
 		        guiClient.clients.put(guiClient.getName(), guiClient);
-			System.out.println("going in loop0");
 		        guiClient.joinOtherClients();
 		        System.out.println("going in loop");
-		        while((NumConnected < NumPlayers) && ((PackFromServ = (MazewarPacket) guiClient.inStream.readObject()) != null)){
+
+		        while((NumConnected < NumPlayers)) {
+				System.out.println("inside while loop, num connected = "+NumConnected);
+			if((PackFromServ = (MazewarPacket) guiClient.inStream.readObject()) != null)
+			{
 		           System.out.println("in client loop packettype = "+PackFromServ.type);
-			   if(PackFromServ.type == MazewarPacket.MW_JOIN && PackFromServ.cID != guiClient.getName()){
+			   if(PackFromServ.type == MazewarPacket.MW_JOIN && !PackFromServ.cID.equals(guiClient.getName())){
+			      System.out.println("recerived packet from client "+PackFromServ.cID + "local: " + );
 		              RemotePlayers = new RemoteClient(PackFromServ.cID, 50);
 		              maze.addRemoteClient(RemotePlayers, PackFromServ.StartPoint, new Direction(PackFromServ.dir));
 		              guiClient.clients.put(RemotePlayers.getName(), RemotePlayers);
@@ -193,6 +197,8 @@ public class Mazewar extends JFrame {
 		              break;
 		           }
 		        }
+			}
+			guiClient.startthreads();
 			System.out.println("going out of loop");
 		
 		        
