@@ -19,7 +19,7 @@ public class MazewarPacket implements Serializable {
 	public static final int RING_INFO      = 802;
 	public static final int RING_PAUSE     = 803;
 	public static final int RING_UNPAUSE   = 804;
-
+	public static final int RING_TOKEN     = 805;
 	/* the packet payload */
 	
 	/* initialized to be a null packet */
