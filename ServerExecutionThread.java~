@@ -3,13 +3,13 @@ import java.io.*;
 import java.util.*;
 
 
-public class MazewarBroadcastThread extends Thread {
+public class ServerExecutionThread extends Thread {
 	
  	public int tID;	
 	private Queue<MazewarPacket> inQueue;
 	private Map<Integer, MazewarServerHandlerThread> clients;
 	
-	public MazewarBroadcastThread
+	public ServerExecutionThread
 			(int tID, Queue<MazewarPacket> incomingQueue, Map<Integer, MazewarServerHandlerThread> clients) 
 	
 	{
@@ -17,26 +17,26 @@ public class MazewarBroadcastThread extends Thread {
 		this.tID = tID;
 		this.inQueue = incomingQueue;
 		this.clients = clients;
-		System.out.println("Created new BroadcastThread; tID = "+ tID);
+		System.out.println("Created new ExecutionThread; tID = "+ tID);
 	}
 	
 	
-/*
+
 	// keep checking if queue is not empty (polling/timer interrupts)
 	// deque packet
-	// process packet (handle fire event here) <---
+	// process packet (handle fire event here)
 	// broadcast to clients
 	public void run() {
 		while(true){
 			if(inQueue.size() > 0) {
-			System.out.println("Broadcasting packet");
-			MazewarPacket top = inQueue.remove();
-			broadcast(top);
+				System.out.println("Executing packet");
+				MazewarPacket top = inQueue.remove();
+				broadcast(top);
 			}
 		}
 	}
 
-	// multicast a packet
+	// update the queue
 	public void broadcast(MazewarPacket currPacket) {
 
 		Set<Integer> s = clients.keySet();
@@ -45,6 +45,6 @@ public class MazewarBroadcastThread extends Thread {
        			t.send(currPacket);
  		}
 	}
-*/
+
 
 };

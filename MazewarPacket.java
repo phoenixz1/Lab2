@@ -1,5 +1,6 @@
 import java.io.Serializable;
 import java.awt.event.KeyEvent;
+import java.util.*;
 
 public class MazewarPacket implements Serializable {
 
@@ -12,6 +13,13 @@ public class MazewarPacket implements Serializable {
 	public static final int MW_START       = 500;
 	public static final int MW_TICK	       = 600;
 	public static final int MW_INIT	       = 700;
+	/*new formats for p2p*/
+	public static final int JOIN_SERV      = 800;
+	public static final int MW_ELECTION    = 801;
+	public static final int RING_INFO      = 802;
+	public static final int RING_PAUSE     = 803;
+	public static final int RING_UNPAUSE   = 804;
+
 	/* the packet payload */
 	
 	/* initialized to be a null packet */
@@ -27,4 +35,9 @@ public class MazewarPacket implements Serializable {
 	public Point StartPoint = null;
 	public String dir = null;
 
+	// Map object to hold list of clients in some cases (eg. join)
+	public Map clist = null;
+	
+	// Name of elected party leader 
+	public String leader;
 };

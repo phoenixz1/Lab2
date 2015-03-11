@@ -1,4 +1,4 @@
-/*
+
 The issue we are referring to is the following: 
 
 On the receipt of a missile tick (or every 200ms in the single player code base), the way the game moves the missiles is that it iterates through the projectileMap - which is a HashMap of the currently existing missiles - and calls the moveProjectile function on each projectile. What the original code base fails to check is if the missile to which the current iterator refers to has already been destroyed by another missile or not. The clean up of dead projectiles is done after iterating through all the projectiles and calling moveProjectile.
@@ -45,5 +45,5 @@ So the bug fix needs to be in the missileTick() method.
 
 Also, you might need to add a remove_flag variable in order to keep track of whether the projectile was removed or not.
 
-*/
+
  		 	   		  

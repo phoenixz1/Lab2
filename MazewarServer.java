@@ -4,19 +4,8 @@ import java.util.*;
 
 public class MazewarServer {
 
-    private static final int MAX_THREADS = 100;
-
-    // create a global queue to store the incoming client packets
-    public static final Queue<MazewarPacket> serverIncomingQueue = new LinkedList<MazewarPacket>();
-
-    // global List of threads serving clients
-    public static final Map<Integer, MazewarServerHandlerThread> clients = new HashMap();
-
-    private static MazewarBroadcastThread broadcaster;
-    
-    private static MazewarTickerThread ticker;
-
-    private static int threadNum = 0;
+    // Map to store the client names and port numbers in insertion order
+    public static final Map<String, Socket> clients = new LinkedHashMap<String, Socket>();
 
 
     public static void main(String[] args) throws IOException {
@@ -34,19 +23,13 @@ public class MazewarServer {
             System.exit(-1);
         }
 
-	broadcaster = new MazewarBroadcastThread(threadNum, serverIncomingQueue, clients);
-	ticker = new MazewarTickerThread(clients, threadNum);
-	broadcaster.start();
-	ticker.start();
-
+	int threadnum = 0;
         while (listening) { // listen and enqueue
-		threadNum = ++threadNum % MAX_THREADS;
-        	MazewarServerHandlerThread client = 
-			new MazewarServerHandlerThread(threadNum, serverSocket.accept(), serverIncomingQueue, clients);
-		clients.put(threadNum,client);
+		threadnum++;
+        	MazewarServerHandlerThread client = new MazewarServerHandlerThread(threadnum, serverSocket.accept(), clients);
 		client.start();
         }
         serverSocket.close();
-    }
+    } 
 }
 
