@@ -20,6 +20,8 @@ public class ClientExecutionThread extends Thread {
 	
 	// ***Lab3*** Socket to communicate to the next client in the ring
 	Socket nextclientSkt = null;
+
+
 	
 	
 	
@@ -89,8 +91,16 @@ public class ClientExecutionThread extends Thread {
 		else if(pkt.type == MazewarPacket.MW_TICK){
 			c.maze.missiletick();
 		}
+
 		else if(pkt.type == MazewarPacket.JOIN_SERV) {
-			
+			clist = pkt.clist;
+            MazewarPacket multicastpkt = new MazewarPacket();
+            multicastpkt.type = MazewarPacket.CLIENTINFO_REQUEST;
+            multicastpkt.cID = this.getName();
+            Socket clientsocket = new Socket(hostname, port);//hostname and desired port of self
+            multicastpkt.newSocket = clientsocket;
+            
+			multicast(clist, multicastpkt);
 		}
 		else if(pkt.type == MazewarPacket.RING_INIT) {
 
@@ -110,7 +120,17 @@ public class ClientExecutionThread extends Thread {
 			// ticker.start();
 			// isleader = true;
 		}
-
+		else if(pkt.type == MazewarPacket.CLIENTINFO_REQUEST){
+			MazewarPacket pkttonew = new MazewarPacket();
+			pkttonew.type = MazewarPacket.CLIENTINFO_REPLY;
+			pkttonew.cID = this.getName();
+			pkttonew.StartPoint = this.getPoint();
+			pkttonew.dir =  this.getOrientation().toString();
+			
+			
+			
+			
+		}
 
 		else { // Other types have no actions
 			return;

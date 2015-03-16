@@ -181,7 +181,7 @@ public class Mazewar extends JFrame {
 		        guiClient.joinOtherClients();
 		        System.out.println("going in loop");
 
-		        while((NumConnected < NumPlayers)) {
+		      /*  while((NumConnected < NumPlayers)) {
 				System.out.println("inside while loop, num connected = "+NumConnected);
 			if((PackFromServ = (MazewarPacket) guiClient.inStream.readObject()) != null)
 			{
@@ -197,7 +197,7 @@ public class Mazewar extends JFrame {
 		              break;
 		           }
 		        }
-			}
+			}*/
 			guiClient.startthreads();
 			System.out.println("going out of loop");
 		
