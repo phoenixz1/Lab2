@@ -35,20 +35,20 @@ public class MazewarServerHandlerThread extends Thread {
 			ObjectOutputStream toClient = new ObjectOutputStream(socket.getOutputStream());
 
 
-			while (( packetFromClient = (MazewarPacket) fromClient.readObject()) != null) {				
+			while (( packetFromClient = (MazewarPacket) fromClient.readObject()) != null) 
+			{				
 				
 				MazewarPacket packetToClient = new MazewarPacket();				
 				
 				if(packetFromClient.type == MazewarPacket.JOIN_SERV) {
-					cID = packetFromClient.cID;
-					
-					packetToClient.type = MazewarPacket.JOIN_SERV;
-					packetToClient.clist = new LinkedHashMap<String, Socket>(clients);
-					//packetToClient.leader = clients.keySet().toArray()[0];
-					
-					toClient.writeObject(packetToClient);
-					
-					clients.put(packetFromClient.cID,this.socket);
+					synchronized(this) {					
+						cID = packetFromClient.cID;
+						packetToClient.type = MazewarPacket.JOIN_SERV;
+						packetToClient.clist = new LinkedHashMap<String, Socket>(clients);
+						//packetToClient.leader = clients.keySet().toArray()[0];
+						toClient.writeObject(packetToClient);
+						clients.put(packetFromClient.cID,this.socket);
+					}
 					continue;
 					
 				}
@@ -57,8 +57,13 @@ public class MazewarServerHandlerThread extends Thread {
 
 				}
 				else if(packetFromClient.type == MazewarPacket.MW_BYE || packetFromClient.type == MazewarPacket.MW_NULL) {
-					gotByePacket = true;
-					break;
+					if(packetFromClient.cID == cID) {
+						gotByePacket = true;
+						break;
+					}
+					else {
+						clients.remove(cID);
+					}
 				}
 				else {/* if code comes here, there is an error in the packet */
 					System.out.println("UNKNOWN PACKET SENT TO SERVER BY "+packetFromClient.cID);
@@ -67,12 +72,13 @@ public class MazewarServerHandlerThread extends Thread {
 
 				
 			}
-			
 			/* cleanup when client exits */
-			fromClient.close();
-			toClient.close();
-			clients.remove(cID);
-			socket.close();
+			synchronized(this) {
+				fromClient.close();
+				toClient.close();
+				clients.remove(cID);
+				socket.close();
+			}
 
 		} catch (IOException e) {
 			if(!gotByePacket)
@@ -83,6 +89,9 @@ public class MazewarServerHandlerThread extends Thread {
 		}
 	}
 
+	public void send(MazewarPacket pkt){
+		;
+	}
 
 	
 }

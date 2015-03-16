@@ -4,9 +4,9 @@ import java.util.*;
 
 public class MazewarServer {
 
-    // Map to store the client names and port numbers in insertion order
-    public static final Map<Integer, Socket> clients = new LinkedHashMap<String, Socket>();
-
+    // Maps to store the client names and port numbers, and handler threads in insertion order
+    public static final Map<String, Socket> clients = new LinkedHashMap<String, Socket>();
+    public static final ArrayList<MazewarServerHandlerThread> handlrthreads = new ArrayList<MazewarServerHandlerThread>();
 
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = null;
@@ -26,10 +26,20 @@ public class MazewarServer {
 	int threadnum = 0;
         while (listening) { // listen and enqueue
 		threadnum++;
-        	MazewarServerHandlerThread client = new MazewarServerHandlerThread(threadnum, serverSocket.accept(), clients);
-		client.start();
+        	MazewarServerHandlerThread hthread = new MazewarServerHandlerThread(threadnum, serverSocket.accept(), clients);
+		handlrthreads.add(hthread);
+		hthread.start();
+		syncmaps();
         }
         serverSocket.close();
     } 
+
+    public static void syncmaps() {
+	// delete handlrthreads that have been removed from clients
+	
+	System.out.println("Fn: syncmaps");
+	System.out.println("Clients:" + clients.keySet());
+	System.out.println("Leader:" + handlrthreads[0].cID);
+   }
 }
 

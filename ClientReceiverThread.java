@@ -30,11 +30,13 @@ public class ClientReceiverThread extends Thread {
 	    MazewarPacket packetFromServer;
 	    try {
 		while ((packetFromServer = (MazewarPacket) inStream.readObject()) != null) {
-                    inQueue.add(packetFromServer);
-                }
+		    synchronized(this) {
+                    	inQueue.add(packetFromServer);
+                    }
+		}
 		// connection ended
-                //inStream.close();
-                //socket.close();
+                // inStream.close();
+                // socket.close();
 	    } catch (IOException e) {
 		 System.err.println("ERROR: Couldn't get I/O for the connection.");
 		 System.exit(1);

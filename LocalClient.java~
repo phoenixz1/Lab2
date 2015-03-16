@@ -40,6 +40,15 @@ public abstract class LocalClient extends Client {
 		 
 	// map of containing active players on maze (Client.name<String> --> <Client Object>)
 	public static final Map<String, Client> clients = new HashMap();
+
+	// ***Lab3*** map containing connections to all clients
+	public static final Map<String, Socket> clientsconn = new HashMap();
+	
+	// ***Lab3*** Socket to communicate to the next client in the ring
+	Socket nextclientSkt = null;
+	
+	// ***Lab3*** Queue to store outgoing packets (to be multicasted on token receive)
+	public static final Queue<MazewarPacket> outQueue = new LinkedList<MazewarPacket>();
 	
 	// thread to listen from server and enqueue packets
 	ClientReceiverThread enquethread;
@@ -52,7 +61,7 @@ public abstract class LocalClient extends Client {
 	int port;
 	
 	// Socket and streams to communicate to the server with
-	Socket mwSocket = null;
+	Socket srvSocket = null;
         public ObjectOutputStream outStream = null;
         public ObjectInputStream inStream = null;
 
@@ -71,11 +80,11 @@ public abstract class LocalClient extends Client {
             port = port_num;
             try {
             	// Initialize the socket to the server's host name and port #
-            	mwSocket = new Socket(hostname,port);
+            	srvSocket = new Socket(hostname,port);
 
             	System.out.println("Socket created.");
-            	outStream = new ObjectOutputStream(mwSocket.getOutputStream());
-            	inStream = new ObjectInputStream(mwSocket.getInputStream());
+            	outStream = new ObjectOutputStream(srvSocket.getOutputStream());
+            	inStream = new ObjectInputStream(srvSocket.getInputStream());
 
 		System.out.println("Socket & input stream created.");
             } catch (UnknownHostException e) {
@@ -85,15 +94,15 @@ public abstract class LocalClient extends Client {
 		System.err.println("ERROR: Couldn't get I/O for the connection.");
 		System.exit(1);
 	    }
-	    enquethread = new ClientReceiverThread(mwSocket, inQueue, inStream);
-	    dequethread = new ClientExecutionThread(inQueue, clients); 
+	    enquethread = new ClientReceiverThread(srvSocket, inQueue, inStream);
+	    dequethread = new ClientExecutionThread(inQueue, clients, false); 
 
         }
 
 	public void startthreads(){
 	    enquethread.start();
 	    dequethread.start();
-}
+	}
 
 		
 		/*
