@@ -78,15 +78,15 @@ public class ClientExecutionThread extends Thread {
                         } else if(e.getKeyCode() == KeyEvent.VK_SPACE) {
                                 c.fire();
                         }
+			sendack(cID);
 		}
 		else if(pkt.type == MazewarPacket.MW_BYE) { // Client wants to quit the game
 			// Remove the client from the hash map of players active in the game and from the maze
+			
 			players.remove(cID);
 			c.maze.removeClient(c);
+			sendack(cID);
 			
-			if(c.getType() == 25) { // Local client is quitting; exit from the Mazewar application
-				Mazewar.quit();
-			}
 		}
 		else if(pkt.type == MazewarPacket.MW_TICK){
 			c.maze.missiletick();
@@ -94,11 +94,11 @@ public class ClientExecutionThread extends Thread {
 
 		else if(pkt.type == MazewarPacket.JOIN_SERV) {
 			clist = pkt.clist;
-            MazewarPacket multicastpkt = new MazewarPacket();
-            multicastpkt.type = MazewarPacket.CLIENTINFO_REQUEST;
-            multicastpkt.cID = this.getName();
-            Socket clientsocket = new Socket(hostname, port);//hostname and desired port of self
-            multicastpkt.newSocket = clientsocket;
+            		MazewarPacket multicastpkt = new MazewarPacket();
+           		 multicastpkt.type = MazewarPacket.CLIENTINFO_REQUEST;
+            		multicastpkt.cID = this.getName();
+            		Socket clientsocket = new Socket(hostname, port);//hostname and desired port of self
+            		multicastpkt.newSocket = clientsocket;
             
 			multicast(clist, multicastpkt);
 		}
@@ -117,8 +117,8 @@ public class ClientExecutionThread extends Thread {
 		else if(pkt.type == MazewarPacket.MW_ELECTION) {
 			// start a ticker thread
 			ticker = new MazewarTickerThread();
-			// ticker.start();
-			// isleader = true;
+			ticker.start();
+			isleader = true;
 		}
 		else if(pkt.type == MazewarPacket.CLIENTINFO_REQUEST){
 			MazewarPacket pkttonew = new MazewarPacket();
@@ -126,9 +126,6 @@ public class ClientExecutionThread extends Thread {
 			pkttonew.cID = this.getName();
 			pkttonew.StartPoint = this.getPoint();
 			pkttonew.dir =  this.getOrientation().toString();
-			
-			
-			
 			
 		}
 
@@ -149,6 +146,9 @@ public class ClientExecutionThread extends Thread {
 	public void sendmcast(MazewarPacket pkt) {
 		// Special multicast to be used only by leader
 		// send RING_STOP and RING_RESUME
+	}
+	public void sendack (String client) {
+
 	}
 
 }
