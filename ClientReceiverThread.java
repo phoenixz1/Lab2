@@ -33,8 +33,6 @@ public class ClientReceiverThread extends Thread {
 		    // check acks and unpauses
 
 
-
-
 		    synchronized(this) {
                     	inQueue.add(packetFromServer);
                     }

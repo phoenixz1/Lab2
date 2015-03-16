@@ -142,11 +142,39 @@ public class ClientExecutionThread extends Thread {
 	public void sendmcast() {
 		// Dequeue and multicast the head of outqueue
 		// Send RING_TOKEN to next client
+
+		if (!clientsconn.isEmpty()){
+			Iterator i = clientsconn.entrySet().iterator();
+			MazewarPacket outPacket = outQueue.remove();
+		
+			while (i.hasNext()){
+				Object o = i.next();
+				assert(o instanceof Socket);
+			
+				try {
+					ObjectOutputStream outStream = new ObjectOutputStream(((Socket)o).getOutputStream());
+				} catch (IOException e) {
+					System.err.println("ERROR: Couldn't get I/O for the naming server connection.");
+					System.exit(1);
+				}
+			
+				try {
+					outStream.writeObject(outPacket);
+				} catch (IOException e) {
+					System.err.println("ERROR: Could not get I/O for the connection.");
+					System.exit(1);
+				}
+			
+				outStream.close();
+			}
+		}
 	}
+
 	public void sendmcast(MazewarPacket pkt) {
 		// Special multicast to be used only by leader
 		// send RING_STOP and RING_RESUME
 	}
+
 	public void sendack (String client) {
 
 	}

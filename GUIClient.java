@@ -57,15 +57,17 @@ public class GUIClient extends LocalClient implements KeyListener {
                 else {
                         outPkt.type = MazewarPacket.MW_REQUEST;
                 }
+
+		this.outQueue.add(outPkt); // queue this packet to be multicasted
                 
                 // Send the packet out through the socket's output stream
-		try {                
+//		try {                
 			//this.outStream.writeObject(outPkt);
-			this.outQueue.add(outPkt); // queue this packet to be multicasted
-		} catch (IOException ex) {
-		 System.err.println("ERROR: Couldn't get I/O for the connection.");
-		 System.exit(1);
-		}
+//			this.outQueue.add(outPkt); // queue this packet to be multicasted
+//		} catch (IOException ex) {
+//		 System.err.println("ERROR: Couldn't get I/O for the connection.");
+//		 System.exit(1);
+//		}
         }
         
         /**

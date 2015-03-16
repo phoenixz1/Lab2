@@ -31,6 +31,10 @@ public class ClientReceiverThread extends Thread {
 	    try {
 		while ((packetFromServer = (MazewarPacket) inStream.readObject()) != null) {
 		    // check acks and unpauses
+
+
+
+
 		    synchronized(this) {
                     	inQueue.add(packetFromServer);
                     }

@@ -48,6 +48,10 @@ public class GUIClient extends LocalClient implements KeyListener {
                 outPkt.event = e;
                 
                 if((e.getKeyChar() == 'q') || (e.getKeyChar() == 'Q')) {
+			if(this.isleader == true) {
+				// send MW_ELECTION packet to the next client
+				// delete this.tickerthread;
+			}
                         outPkt.type = MazewarPacket.MW_BYE;
                 }
                 else {
