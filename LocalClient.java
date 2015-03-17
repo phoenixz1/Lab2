@@ -45,7 +45,7 @@ public abstract class LocalClient extends Client {
 	public static final Map<String, Socket> clientsconn = new HashMap();
 	
 	// ***Lab3*** Socket to communicate to the next client in the ring
-	Socket nextclientSkt = null;
+	public Socket nextclientSkt = null;
 	
 	// ***Lab3*** Queue to store outgoing packets (to be multicasted on token receive)
 	public static final Queue<MazewarPacket> outQueue = new LinkedList<MazewarPacket>();
@@ -95,7 +95,7 @@ public abstract class LocalClient extends Client {
 		System.exit(1);
 	    }
 	    enquethread = new ClientReceiverThread(srvSocket, inQueue, inStream);
-	    dequethread = new ClientExecutionThread(inQueue, outQueue, clients); 
+	    dequethread = new ClientExecutionThread(inQueue, outQueue, clients, name); 
 
         }
 

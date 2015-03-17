@@ -34,7 +34,11 @@ public class ClientReceiverThread extends Thread {
 
 
 		    synchronized(this) {
-                    	inQueue.add(packetFromServer);
+		    	if(packetFromServer.type == MazewarPacket.RING_UNPAUSE)
+		    		ClientExecutionThread.ispaused = false;
+		    	else if(packetFromServer.type == MazewarPacket.ACK)
+		    		ClientExecutionThread.ACKnum++; //ACKS and unpause is not queued
+		    	else inQueue.add(packetFromServer);
                     }
 		}
 		// connection ended

@@ -21,7 +21,7 @@ public class MazewarPacket implements Serializable {
 	public static final int RING_UNPAUSE   = 804;
 	public static final int RING_TOKEN     = 805;
 	public static final int CLIENTINFO_REQUEST	=806;
-	public static final int CLIENTINFO_REPLY	=807;
+	public static final int ACK			   = 900;
 
 	/* the packet payload */
 	
@@ -40,8 +40,11 @@ public class MazewarPacket implements Serializable {
 
 	// Map object to hold list of clients in some cases (eg. join)
 	public Map clist = null;
+	//Map object of list of client sockets (hostname and port info)
+	public Map cconns= null;
 	
-	public Socket newSocket = null;
+	public Socket newsocket = null;
 	// Name of elected party leader 
 	public String leader;
+	
 };

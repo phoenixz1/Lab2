@@ -145,7 +145,7 @@ public class Mazewar extends JFrame {
                 int NumPlayers = 3; // Total number of other players needed to play the Mazewar game
                 
                 //A RemoteClient to add remote players into the maze
-                RemoteClient RemotePlayers;
+                //RemoteClient RemotePlayers;
                 
                 int NumConnected = 0; // Number of other players connected to the Mazewar server
                 
@@ -178,8 +178,9 @@ public class Mazewar extends JFrame {
 		        maze.addClient(guiClient);
 		        this.addKeyListener(guiClient);
 		        guiClient.clients.put(guiClient.getName(), guiClient);
+		        guiClient.startthreads();
 		        guiClient.joinOtherClients();
-		        System.out.println("going in loop");
+		        //System.out.println("going in loop");
 
 		      /*  while((NumConnected < NumPlayers)) {
 				System.out.println("inside while loop, num connected = "+NumConnected);
@@ -198,7 +199,7 @@ public class Mazewar extends JFrame {
 		           }
 		        }
 			}*/
-			guiClient.startthreads();
+			
 			System.out.println("going out of loop");
 		
 		        

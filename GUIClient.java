@@ -16,7 +16,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 USA.
 */
-
+import java.net.*;
 import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
 import java.io.*;
@@ -29,7 +29,7 @@ import java.io.*;
  */
 
 public class GUIClient extends LocalClient implements KeyListener {
-
+		int defaultport= 8000;
         /**
          * Create a GUI controlled {@link LocalClient}.  
          */
@@ -93,8 +93,7 @@ public class GUIClient extends LocalClient implements KeyListener {
 
               pktToServ.type = MazewarPacket.MW_JOIN;
               pktToServ.cID = this.getName();
-              pktToServ.StartPoint = this.getPoint();
-              pktToServ.dir =  this.getOrientation().toString();
+              pktToServ.newsocket = new Socket(InetAddress.getLocalHost(), defaultport);//new client address
               
               // Send the packet through the socket's output stream
 	      try {
