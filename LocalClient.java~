@@ -58,7 +58,6 @@ public abstract class LocalClient extends Client {
 	ClientExecutionThread dequethread;
 	
 	// Host name and port number of the Mazewar server
-
 	String hostname;
 	int port;
 	

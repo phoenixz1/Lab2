@@ -89,7 +89,6 @@ public class ClientExecutionThread extends Thread {
 			// Remove the client from the hash map of players active in the game and from the maze
 			if(LocalClient.isleader) {
 			// tell server a client has quit
-				
 			}
 			if(LocalClient.nextclientSkt.getInetAddress() == clientsconn.get(pkt.cID).getInetAddress()) {
 			// update the next player of current client
@@ -113,7 +112,7 @@ public class ClientExecutionThread extends Thread {
             			MazewarPacket leaderpkt = new MazewarPacket();
 	            	leaderpkt.type = MazewarPacket.CLIENTINFO_REQUEST;
 	            	leaderpkt.cID = localID;
-       		     	Socket clientsocket = new Socket(InetAddress.getLocalHost(), defaultport); //local hostname and desired port of self
+       		     	Socket clientsocket = new Socket(InetAddress.getLocalHost(), defaultport);//local hostname and desired port of self
        		     	leaderpkt.newsocket = clientsocket;
        		     	Client c = players.get(localID);
        		     	leaderpkt.StartPoint = c.getPoint();

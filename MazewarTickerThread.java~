@@ -16,7 +16,6 @@ public class MazewarTickerThread extends Thread{
 	//added forever loop. 
 	//ticker is like a server-side clock that broadcast the tick signal every 200ms
 	public void run(){
-	while(!Thread.interrupted()) {	
 		try{
 			while(numthreads < 2);
 			MazewarPacket startpkt =  new MazewarPacket();
@@ -32,7 +31,6 @@ public class MazewarTickerThread extends Thread{
 			e.printStackTrace();
 			
 		}
-	}
 	}
 	
 	public void broadcast(MazewarPacket currPacket) {
