@@ -97,7 +97,7 @@ public class GUIClient extends LocalClient implements KeyListener {
               // Create a packet to send to the server
               MazewarPacket pktToServ = new MazewarPacket();
 
-              pktToServ.type = MazewarPacket.MW_JOIN;
+              pktToServ.type = MazewarPacket.JOIN_SERV;
               pktToServ.cID = this.getName();
               pktToServ.newsocket = new Socket(InetAddress.getLocalHost(), defaultport);//new client address
               

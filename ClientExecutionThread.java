@@ -89,10 +89,12 @@ public class ClientExecutionThread extends Thread {
 			// Remove the client from the hash map of players active in the game and from the maze
 			if(LocalClient.isleader) {
 			// tell server a client has quit
+			LocalClient.outstream.writeObject(pkt);
 				
 			}
 			if(LocalClient.nextclientSkt.getInetAddress() == clientsconn.get(pkt.cID).getInetAddress()) {
-			// update the next player of current client
+			// update the next player
+			
 			}
 			players.remove(pkt.cID);
 			clientsconn.remove(pkt.cID);
@@ -145,18 +147,16 @@ public class ClientExecutionThread extends Thread {
 			sendmcast(pkt);
 			while(ACKnum < ACKmax-1); 
 			Client c = players.get(pkt.leader);
-			c.clientsconn.put(pkt.cID, pkt.newsocket);
+			clientsconn.put(pkt.cID, pkt.newsocket);
 			RemoteClient newClient = new RemoteClient(pkt.cID, 50);
 			c.clients.put(pkt.cID, newClient);
 			c.maze.addRemoteClient(newClient, pkt.StartPoint, new Direction(pkt.dir));
-			clientsconn = c.clientsconn;
-			players = c.clients;
 			
 			MazewarPacket outpkt = new MazewarPacket();
 			outpkt.type = MazewarPacket.RING_INFO;
 			outpkt.clist = c.clients;
-			outpkt.cconns = c.clientsconn;
-			outpkt.newsocket = c.clientsconn.get(pkt.leader);
+			outpkt.cconns = clientsconn;
+			outpkt.newsocket = clientsconn.get(pkt.leader);
 			//send clientmap, socketmap, ring to new client
 			Socket socket = new Socket(pkt.newsocket.getInetAddress(),pkt.newsocket.getPort());
 			ObjectInputStream newinStream = new ObjectInputStream(socket.getInputStream());
@@ -185,7 +185,6 @@ public class ClientExecutionThread extends Thread {
 		else if(pkt.type == MazewarPacket.RING_INFO) { // only new client receives this
 			ispaused = true;
 			Client c= players.get(localID); //DOUBT: potentially empty?
-			c.clientsconn = clientsconn;
 			
 			//creating receive threads
 			if (!clientsconn.isEmpty()){
@@ -194,7 +193,7 @@ public class ClientExecutionThread extends Thread {
 				while (i.hasNext()){
 					Object o = i.next();
 					Socket s = (Socket)o;
-					if(s.getInetAddress() != InetAddress.getLocalHost()){
+					if(!s.getInetAddress().toString().equals(InetAddress.getLocalHost().toString())){
 					Socket socket = new Socket(s.getInetAddress(),s.getPort());
 					ObjectInputStream newinStream = new ObjectInputStream(socket.getInputStream());
 					ClientReceiverThread receivethread = new ClientReceiverThread(socket, inQueue, newinStream); 
@@ -242,16 +241,16 @@ public class ClientExecutionThread extends Thread {
 			
 
 		}
-		else if(pkt.type == MazewarPacket.RING_PAUSE) {
+		else if(pkt.type == MazewarPacket.RING_PAUSE) { //non-leader clients get this
 			ispaused = true;
 			//add new client to all maps
 			Client c = players.get(localID);
-			c.clientsconn.put(pkt.cID, pkt.newsocket);
+			clientsconn.put(pkt.cID, pkt.newsocket);
 			RemoteClient newClient = new RemoteClient(pkt.cID, 50);
 			c.clients.put(pkt.cID, newClient);
 			c.maze.addRemoteClient(newClient, pkt.StartPoint, new Direction(pkt.dir));
-			clientsconn = c.clientsconn;
-			players = c.clients;
+
+			
 			
 			//add new client to ring
 			Socket leader = clientsconn.get(pkt.leader);
