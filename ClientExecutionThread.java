@@ -145,7 +145,6 @@ public class ClientExecutionThread extends Thread {
 			int ACKmax = players.size();
 			ACKnum = 0; //reset ack received
 			sendmcast(pkt);
-			while(ACKnum < ACKmax-1); 
 			Client c = players.get(pkt.leader);
 			clientsconn.put(pkt.cID, pkt.newsocket);
 			RemoteClient newClient = new RemoteClient(pkt.cID, 50);
@@ -184,6 +183,7 @@ public class ClientExecutionThread extends Thread {
 		}
 		else if(pkt.type == MazewarPacket.RING_INFO) { // only new client receives this
 			ispaused = true;
+
 			Client c= players.get(localID); //DOUBT: potentially empty?
 			
 			//creating receive threads
@@ -237,7 +237,7 @@ public class ClientExecutionThread extends Thread {
 		
 			outStream.close(); 
 			//pause
-			while(is_paused);
+			while(is_paused) ;
 			
 
 		}
@@ -321,31 +321,87 @@ public class ClientExecutionThread extends Thread {
 	public void sendmcast() {
 		// Dequeue and multicast the head of outqueue
 		// Send RING_TOKEN to next client
+	        // NOTE: Do not send the packet to the local client
+	        //   - Process the packet immediately after receiving ACK's from all other clients
 
 		if (!clientsconn.isEmpty()){
 			Iterator i = clientsconn.entrySet().iterator();
 			MazewarPacket outPacket = outQueue.remove();
+			int ACKMax = players.size() - 1;
+			Client localClient = players.get(localID);
 		
 			while (i.hasNext()){
 				Object o = i.next();
-				assert(o instanceof Socket);
+				String clientName = (String) o.getKey();
+				Socket info = (Socket) o.getValue();
+
+				// If the socket is from the local client, skip it
+				if (clientName.equals(localID)) {
+				    continue;
+				}
+
+				Socket mcastSock = new Socket(info.getInetAddress(), info.getPort());
 			
 				try {
-					ObjectOutputStream outStream = new ObjectOutputStream(((Socket)o).getOutputStream());
+					ObjectOutputStream outStream = new ObjectOutputStream(mcastSock.getOutputStream());
 				} catch (IOException e) {
-					System.err.println("ERROR: Couldn't get I/O for the naming server connection.");
+					System.err.println("ERROR: Couldn't get I/O for the multicast connection.");
 					System.exit(1);
 				}
 			
 				try {
 					outStream.writeObject(outPacket);
 				} catch (IOException e) {
-					System.err.println("ERROR: Could not get I/O for the connection.");
+					System.err.println("ERROR: Write failed for the multicast connection.");
 					System.exit(1);
 				}
-			
+
 				outStream.close();
+				mcastSock.close();
 			}
+
+			// Wait until all ACK's are received
+			while(ACKNum < ACKMax) ;
+
+			// All ACK's received; process the key event on the local client
+			KeyEvent e = outPacket.event;
+
+			// Up-arrow moves forward.
+                        if(e.getKeyCode() == KeyEvent.VK_UP) {
+                                localClient.forward();
+                        // Down-arrow moves backward.
+                        } else if(e.getKeyCode() == KeyEvent.VK_DOWN) {
+                                localClient.backup();
+                        // Left-arrow turns left.
+                        } else if(e.getKeyCode() == KeyEvent.VK_LEFT) {
+                                localClient.turnLeft();
+                        // Right-arrow turns right.
+                        } else if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                                localClient.turnRight();
+                        // Spacebar fires.
+                        } else if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+                                localClient.fire();
+                        }
+
+			// Event processed; send RING_TOKEN to next client in the ring
+			MazewarPacket ringPacket = new MazewarPacket();
+			ringPacket.type = MazewarPacket.RING_TOKEN;
+
+			try {
+			    ObjectOutputStream nextOutStream = new ObjectOutputStream(LocalClient.nextclientSkt.getOutputStream());
+			} catch (IOException e) {
+			    System.err.println("ERROR: Could not get I/O for the next client connection");
+			    Systme.exit(1);
+			}
+
+			try {
+			    nextOutStream.writeObject(ringPacket);
+			} catch (IOException e) {
+			    System.err.println("ERROR: Write failed for the token passing.");
+			    System.exit(1);
+			}
+
+			nextOutStream.close();
 		}
 	}
 
@@ -354,32 +410,69 @@ public class ClientExecutionThread extends Thread {
 		// send RING_STOP and RING_RESUME
 		if (!clientsconn.isEmpty()){
 			Iterator i = clientsconn.entrySet().iterator();
-		
+			int ACKMax = players.size() - 1;
+			
 			while (i.hasNext()){
 				Object o = i.next();
-				assert(o instanceof Socket);
+				String clientName = (String) o.getKey();
+				Socket info = (Socket) o.getValue();
+
+				// If the socket is from the local client, skip it
+				if (clientName.equals(localID)) {
+				    continue;
+				}
+
+				Socket mcastSock = new Socket(info.getInetAddress(), info.getPort());
 			
 				try {
-					ObjectOutputStream outStream = new ObjectOutputStream(((Socket)o).getOutputStream());
+					ObjectOutputStream outStream = new ObjectOutputStream(mcastSock.getOutputStream());
 				} catch (IOException e) {
-					System.err.println("ERROR: Couldn't get I/O for the naming server connection.");
+					System.err.println("ERROR: Couldn't get I/O for the multicast connection.");
 					System.exit(1);
 				}
 			
 				try {
 					outStream.writeObject(pkt);
 				} catch (IOException e) {
-					System.err.println("ERROR: Could not get I/O for the connection.");
+					System.err.println("ERROR: Write failed for the multicast connection.");
 					System.exit(1);
 				}
-			
+
 				outStream.close();
+				mcastSock.close();
 			}
+
+			// Wait until all ACK's are received
+			while (ACKNum < ACKMax) ;
 		}
 	}
 
 	public void sendack (String client) {
+	    // Create an acknowledgement packet
+	    MazewarPacket ackPkt = new MazewarPacket();
+	    ackPkt.type = MazewarPacket.ACK;
 
+	    // Create a socket to obtain the info on the destination
+	    Socket destInfo = clientsconn.get(client);
+
+	    Socket destSock = new Socket(destInfo.getInetAddress(), destInfo.getPort());
+
+	    try {
+		ObjectOutputStream destOutStream = new ObjectOutputStream(destSock.getOutputStream());
+	    } catch (IOException e) {
+		System.err.println("ERROR: Could not get I/O for the destination connection");
+		System.exit(1);
+	    }
+
+	    try {
+		destOutStream.writeObject(ackPkt);
+	    } catch (IOException e) {
+		System.err.println("ERROR: Write failed for the acknowledgement");
+		System.exit(1);
+	    }
+
+	    destOutStream.close();
+	    destSock.close();
 	}
 
 }

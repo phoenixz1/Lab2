@@ -30,14 +30,13 @@ public class ClientReceiverThread extends Thread {
 	    MazewarPacket packetFromServer;
 	    try {
 		while ((packetFromServer = (MazewarPacket) inStream.readObject()) != null) {
-		    // check acks and unpauses
-
-
+		    
+		    // check acks and unpauses; ACK and RING_UNPAUSE packets are not queued
 		    synchronized(this) {
 		    	if(packetFromServer.type == MazewarPacket.RING_UNPAUSE)
 		    		ClientExecutionThread.ispaused = false;
 		    	else if(packetFromServer.type == MazewarPacket.ACK)
-		    		ClientExecutionThread.ACKnum++; //ACKS and unpause is not queued
+			    ClientExecutionThread.ACKnum++;
 		    	else inQueue.add(packetFromServer);
                     }
 		}
@@ -50,6 +49,9 @@ public class ClientReceiverThread extends Thread {
 	    } catch (ClassNotFoundException e) {
 		 System.err.println("ERROR: Cannot find the class.");
 		 System.exit(1);
+	    } finally {
+		inStream.close();
+		socket.close();
 	    }
 	}
 
