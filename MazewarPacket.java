@@ -1,6 +1,9 @@
 import java.io.Serializable;
 import java.awt.event.KeyEvent;
 import java.util.*;
+import java.net.*;
+import java.io.*;
+import java.lang.*;
 
 public class MazewarPacket implements Serializable {
 
@@ -39,11 +42,11 @@ public class MazewarPacket implements Serializable {
 	public String dir = null;
 
 	// Map object to hold list of clients in some cases (eg. join)
-	public Map clist = null;
+	public Map<String, Client> clist = null;
 	//Map object of list of client sockets (hostname and port info)
-	public Map cconns= null;
+	public Map<String, SocketInfo> cconns= null;
 	
-	public Socket newsocket = null;
+	public SocketInfo newsocket = null;
 	// Name of elected party leader 
 	public String leader;
 	

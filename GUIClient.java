@@ -29,7 +29,7 @@ import java.io.*;
  */
 
 public class GUIClient extends LocalClient implements KeyListener {
-		int defaultport= 8000;
+		int defaultport= 8002;
         /**
          * Create a GUI controlled {@link LocalClient}.  
          */
@@ -48,15 +48,24 @@ public class GUIClient extends LocalClient implements KeyListener {
                 outPkt.event = e;
                 
                 if((e.getKeyChar() == 'q') || (e.getKeyChar() == 'Q')) {
-			if(this.isleader == true) {
+			if(this.isleader == true && LocalClient.clients.size() > 1) {
+				try{
 				// send MW_ELECTION packet to the next client
+				ObjectOutputStream nextstream = new ObjectOutputStream(LocalClient.nextclientSkt.getOutputStream());
 				MazewarPacket electionPkt = new MazewarPacket();
-				electionPkt.type = MW_ELECTION;
-				if(nextclientstream != NULL) {
-					nextclientstream.writeObject(electionPkt);
+				electionPkt.type = MazewarPacket.MW_ELECTION;
+				electionPkt.newsocket = new SocketInfo(LocalClient.nextclientSkt.getInetAddress(), LocalClient.nextclientSkt.getPort());
+				if(nextclientstream != null) {
+					
+						nextstream.writeObject(electionPkt);
+						nextstream.close();
+					
+				}
+				} catch (IOException ex) {
+					ex.printStackTrace();
 				}
 				// stop tickerthread
-				LocalClient.tickerthread.interrupt();		
+				LocalClient.ticker.interrupt();		
 			}
                         outPkt.type = MazewarPacket.MW_BYE;
                 }
@@ -65,7 +74,8 @@ public class GUIClient extends LocalClient implements KeyListener {
                 }
 
 		this.outQueue.add(outPkt); // queue this packet to be multicasted
-                
+		System.out.println("added key events size = "+ outQueue.size());
+                //this.inQueue.add(outPkt);
                 // Send the packet out through the socket's output stream
 //		try {                
 			//this.outStream.writeObject(outPkt);
@@ -95,21 +105,22 @@ public class GUIClient extends LocalClient implements KeyListener {
          */
         public void joinOtherClients(){
               // Create a packet to send to the server
+	    try {
               MazewarPacket pktToServ = new MazewarPacket();
 
               pktToServ.type = MazewarPacket.JOIN_SERV;
               pktToServ.cID = this.getName();
-              pktToServ.newsocket = new Socket(InetAddress.getLocalHost(), defaultport);//new client address
+              pktToServ.newsocket = new SocketInfo(InetAddress.getLocalHost(), defaultport);//new client address
               
               // Send the packet through the socket's output stream
-	      try {
 
-              	outStream.writeObject(pktToServ);
+              	LocalClient.outStream.writeObject(pktToServ);
 	      }
 	      catch (IOException e) {
 		 System.err.println("ERROR: Couldn't get I/O for the connection3.");
 		 e.printStackTrace();
 	       }
+	      
         }
 
 }

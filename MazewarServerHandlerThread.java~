@@ -58,7 +58,7 @@ public class MazewarServerHandlerThread extends Thread {
 							initpkt.type = MazewarPacket.RING_TOKEN;
 							toClient.writeObject(packetToClient);	
 						System.out.println("sent token to client");					
-						}*/	
+						}/*	
 					//}
 					continue;
 					

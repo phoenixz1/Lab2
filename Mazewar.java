@@ -155,7 +155,7 @@ public class Mazewar extends JFrame {
 
 		System.out.println("Before try block.");
 
-		try {
+		//try {
 			System.out.println("After try block.");
 		        // Initialise a socket that listens for player details from the server
 		        Socket PlayerSock = null;//new Socket(serv_hostname, serv_port);
@@ -200,14 +200,14 @@ public class Mazewar extends JFrame {
 		        }
 			}*/
 			
-			System.out.println("going out of loop");
+			// System.out.println("going out of loop");
 		
 		        
 		        // Some cleanup
 		      //  FromServ.close();
 		        //PlayerSock.close();
 
-		} catch (UnknownHostException e) {
+		/*} catch (UnknownHostException e) {
 			System.err.println("ERROR: Don't know where to connect!!");
 			System.exit(1);
 	        } catch (IOException e) {
@@ -216,7 +216,7 @@ public class Mazewar extends JFrame {
 	        } catch (ClassNotFoundException e) {
 			System.err.println("ERROR: Cannot find the class.");
 			System.exit(1);
-		}
+		}*/
                 
                 // Use braces to force constructors not to be called at the beginning of the
                 // constructor.

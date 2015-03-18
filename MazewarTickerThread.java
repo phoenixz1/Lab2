@@ -1,13 +1,17 @@
 import java.util.*;
+import java.net.*;
+import java.lang.*;
+import java.io.*;
 
 public class MazewarTickerThread extends Thread{
-	private Map<Integer, MazewarServerHandlerThread> clients;
-	private int numthreads;
+	private Map<String, SocketInfo> clientsconn;
+	private String localID;
 	
-	public MazewarTickerThread(Map<Integer, MazewarServerHandlerThread> clients, int numthreads){
+	public MazewarTickerThread(Map<String, SocketInfo> clientsconn, String thisID){
 		super("MazewarTickerThread");
-		this.clients = clients;
-		this.numthreads = numthreads;
+		this.clientsconn = clientsconn;
+		this.localID = thisID;
+
 		System.out.println("Created MazewarTickerThread");
 		
 	}
@@ -16,32 +20,52 @@ public class MazewarTickerThread extends Thread{
 	//added forever loop. 
 	//ticker is like a server-side clock that broadcast the tick signal every 200ms
 	public void run(){
-	while(!Thread.interrupted()) {	
+	
 		try{
-			while(numthreads < 2);
-			MazewarPacket startpkt =  new MazewarPacket();
-			startpkt.type = MazewarPacket.MW_START;
-			broadcast(startpkt);
-			while(true){
+
+			while(!Thread.interrupted()){
 			MazewarPacket tik =  new MazewarPacket();
 			tik.type = MazewarPacket.MW_TICK;
+
 			broadcast(tik); 
-			Thread.sleep(200);
+			Thread.sleep(1000);
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-			
 		}
-	}
+	
 	}
 	
 	public void broadcast(MazewarPacket currPacket) {
 
-		Set<Integer> s = clients.keySet();
-		System.out.println("Broadcasting packet type: "+currPacket.type);
-		for(int tid : s) {
-			MazewarServerHandlerThread t = clients.get(tid);
-       			t.send(currPacket);
- 		}
+		if (!clientsconn.isEmpty()){
+			Iterator i = clientsconn.keySet().iterator();
+			
+			while (i.hasNext()){
+				Object o = i.next();
+				assert(o instanceof String);
+
+				SocketInfo info = clientsconn.get((String)o);
+
+				// If the socket is from the local client, skip it
+				if (((String)o).equals(localID)) {
+				    continue;
+				}
+				try {
+					Socket mcastSock = new Socket(info.getInetAddress(), info.getPort());
+					ObjectOutputStream outStream = new ObjectOutputStream(mcastSock.getOutputStream());
+
+					outStream.writeObject(currPacket);
+
+					outStream.close();
+					mcastSock.close();
+				} catch (IOException e) {
+					System.err.println("ERROR: Write failed for the multicast connection.");
+					System.exit(1);
+				}
+			}
+		}
+
+		LocalClient.inQueue.add(currPacket);
 	}
 } 

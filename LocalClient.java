@@ -42,7 +42,7 @@ public abstract class LocalClient extends Client {
 	public static final Map<String, Client> clients = new HashMap();
 
 	// ***Lab3*** map containing connections to all clients
-	public static final Map<String, Socket> clientsconn = new HashMap();
+	public static final Map<String, SocketInfo> clientsconn = new HashMap();
 	
 	// ***Lab3*** Socket to communicate to the next client in the ring
 	public static Socket nextclientSkt = null;
@@ -51,6 +51,8 @@ public abstract class LocalClient extends Client {
 	// ***Lab3*** Queue to store outgoing packets (to be multicasted on token receive)
 	public static final Queue<MazewarPacket> outQueue = new LinkedList<MazewarPacket>();
 	
+	public static MazewarTickerThread ticker;
+
 	// thread to listen from server and enqueue packets
 	ClientReceiverThread enquethread;
 		
@@ -64,11 +66,14 @@ public abstract class LocalClient extends Client {
 	
 	// Socket and streams to communicate to the server with
 	Socket srvSocket = null;
-        public ObjectOutputStream outStream = null;
-        public ObjectInputStream inStream = null;
+        public static ObjectOutputStream outStream = null;
+        public static ObjectInputStream inStream = null;
 
 	// boolean flag to indicate if localclient is party leader
 	public static boolean isleader;
+
+	public static boolean ispaused;
+	public static int ACKnum;
 
         /** 
          * Create a {@link Client} local to this machine.
@@ -83,6 +88,8 @@ public abstract class LocalClient extends Client {
             
             hostname = host;
             port = port_num;
+	    ispaused = false;
+	    ACKnum = 0;
             try {
             	// Initialize the socket to the server's host name and port #
             	srvSocket = new Socket(hostname,port);
@@ -99,32 +106,18 @@ public abstract class LocalClient extends Client {
 		System.err.println("ERROR: Couldn't get I/O for the connection.");
 		System.exit(1);
 	    }
-	    enquethread = new ClientReceiverThread(srvSocket, inQueue, inStream);
-	    dequethread = new ClientExecutionThread(inQueue, outQueue, clients, name); 
+	    enquethread = new ClientReceiverThread(srvSocket, inQueue, inStream, ispaused, ACKnum);
+	    dequethread = new ClientExecutionThread(inQueue, outQueue, clients, name, clientsconn, ispaused, ACKnum);
+	    ticker = null; 
 
         }
 
 	public void startthreads(){
 	    enquethread.start();
+	    System.out.println("Inside startthreads");
 	    dequethread.start();
 	}
 
 		
-		/*
-		*  TODO: 1. Send packages to server
-		*			- Create functions to handle key events
-		*			- Create MW_REQUEST package
-		*			- Send to server via "outStream"
-		*
-		*		 2. Read and execute packages from queue
-		*			- Modify ClientExecutionThread.java
-		*			- Dequeue package, lookup package.cID in map 'clients'
-		*			- Execute package.KeyEvent on that client
-		*
-		*		 3.	Handle Fire events
-		*			- If a client dies, send MW_INIT package
-		*			  to server for that client
-		*			
-		*		 4. ???
-		*/
+
 }
