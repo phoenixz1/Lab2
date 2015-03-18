@@ -24,8 +24,8 @@ public class MazewarPacket implements Serializable {
 	public static final int RING_UNPAUSE   = 804;
 	public static final int RING_TOKEN     = 805;
 	public static final int CLIENTINFO_REQUEST	=806;
-	public static final int ACK			   = 900;
-
+	public static final int ACK	       = 900;
+	public static final int MCAST_REQ	=901;
 	/* the packet payload */
 	
 	/* initialized to be a null packet */

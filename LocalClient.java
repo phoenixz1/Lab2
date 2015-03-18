@@ -43,6 +43,8 @@ public abstract class LocalClient extends Client {
 
 	// ***Lab3*** map containing connections to all clients
 	public static final Map<String, SocketInfo> clientsconn = new HashMap();
+
+	public static final Map<String, Socket> p2psockets = new HashMap();
 	
 	// ***Lab3*** Socket to communicate to the next client in the ring
 	public static Socket nextclientSkt = null;
@@ -58,14 +60,18 @@ public abstract class LocalClient extends Client {
 		
 	// thread to dequeue and process packets
 	ClientExecutionThread dequethread;
+
+	// Thread to listen for client connection requests
+	ClientListenerThread listenThread;
 	
 	// Host name and port number of the Mazewar server
 
 	String hostname;
 	int port;
-	
+	int defaultport= 8002;
 	// Socket and streams to communicate to the server with
 	Socket srvSocket = null;
+	ServerSocket ownSocket = null;
         public static ObjectOutputStream outStream = null;
         public static ObjectInputStream inStream = null;
 
@@ -93,7 +99,7 @@ public abstract class LocalClient extends Client {
             try {
             	// Initialize the socket to the server's host name and port #
             	srvSocket = new Socket(hostname,port);
-
+		ownSocket = new ServerSocket(defaultport);
             	System.out.println("Socket created.");
             	outStream = new ObjectOutputStream(srvSocket.getOutputStream());
             	inStream = new ObjectInputStream(srvSocket.getInputStream());
@@ -108,14 +114,15 @@ public abstract class LocalClient extends Client {
 	    }
 	    enquethread = new ClientReceiverThread(srvSocket, inQueue, inStream, ispaused, ACKnum);
 	    dequethread = new ClientExecutionThread(inQueue, outQueue, clients, name, clientsconn, ispaused, ACKnum);
-	    ticker = null; 
+	    listenThread = new ClientListenerThread(ownSocket, inQueue);
+	    ticker = null;
 
         }
 
 	public void startthreads(){
 	    enquethread.start();
-	    System.out.println("Inside startthreads");
 	    dequethread.start();
+	    listenThread.start();
 	}
 
 		
