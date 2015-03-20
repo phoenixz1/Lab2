@@ -72,11 +72,8 @@ public class GUIClient extends LocalClient implements KeyListener {
                 else {
                         outPkt.type = MazewarPacket.MW_REQUEST;
                 }
-		try{
-			this.outQueue.put(outPkt); // queue this packet to be multicasted
-		} catch(InterruptedException ex) {
-			ex.printStackTrace();
-		}
+
+		this.outQueue.put(outPkt); // queue this packet to be multicasted
 		System.out.println("added key events. outqueue size = "+ outQueue.size()+" , Inqueue size = "+ inQueue.size());
                 //this.inQueue.add(outPkt);
                 // Send the packet out through the socket's output stream

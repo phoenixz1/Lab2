@@ -2,13 +2,14 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.lang.*;
+import java.util.concurrent.*;
 
 public class ClientListenerThread extends Thread {
 	
 	public ServerSocket listenSocket = null;
-	private Queue<MazewarPacket> inQueue;
+	private LinkedBlockingQueue<MazewarPacket> inQueue;
 	
-	public ClientListenerThread (ServerSocket locSocket, Queue<MazewarPacket> incomingQueue){
+	public ClientListenerThread (ServerSocket locSocket, LinkedBlockingQueue<MazewarPacket> incomingQueue){
 		super("ClientListenerThread");
 		listenSocket = locSocket;
 		inQueue = incomingQueue;
@@ -22,21 +23,22 @@ public class ClientListenerThread extends Thread {
 		
 		// Listen for new clients trying to join the game session
 		// If a client wants to connect, create a new ClientReceiverThread for that client
-		while (!Thread.interrupted()) {
-			try {
+		try {
+			while (!Thread.interrupted()) {
+				
 				connSocket = listenSocket.accept();
 				connInStream = new ObjectInputStream(connSocket.getInputStream());
-				connOutStream = new ObjectOutputStream(connSocket.getOutputStream());
-			} catch (IOException e) {
+				connOutStream = new ObjectOutputStream(connSocket.getOutputStream()); 
+				System.out.println("Inside listener, creating new thread");
+				new ClientReceiverThread(connSocket, inQueue, connInStream).start();
+			}
+
+			connInStream.close();
+			connSocket.close();
+			listenSocket.close();
+		} catch (IOException e) {
 				System.err.println("ERROR: Couldn't get I/O for the naming server connection.");
 				System.exit(1);
-			}
-			
-			new ClientReceiverThread(connSocket, inQueue, connInStream).start();
 		}
-
-		connInStream.close();
-		connSocket.close();
-		listenSocket.close();
 	}
 }

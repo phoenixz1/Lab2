@@ -2,13 +2,14 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.lang.*;
+import java.util.concurrent.*;
 
 public class ClientListenerThread extends Thread {
 	
 	public ServerSocket listenSocket = null;
-	private Queue<MazewarPacket> inQueue;
+	private LinkedBlockingQueue<MazewarPacket> inQueue;
 	
-	public ClientListenerThread (ServerSocket locSocket, Queue<MazewarPacket> incomingQueue){
+	public ClientListenerThread (ServerSocket locSocket, LinkedBlockingQueue<MazewarPacket> incomingQueue){
 		super("ClientListenerThread");
 		listenSocket = locSocket;
 		inQueue = incomingQueue;
@@ -28,7 +29,7 @@ public class ClientListenerThread extends Thread {
 				connSocket = listenSocket.accept();
 				connInStream = new ObjectInputStream(connSocket.getInputStream());
 				connOutStream = new ObjectOutputStream(connSocket.getOutputStream()); 
-			
+				System.out.println("Inside listener, creating new thread");
 				new ClientReceiverThread(connSocket, inQueue, connInStream).start();
 			}
 

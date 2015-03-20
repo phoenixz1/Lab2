@@ -2,6 +2,7 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 import java.lang.*;
+import java.util.concurrent.*;
 import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
 
@@ -10,8 +11,8 @@ public class ClientExecutionThread extends Thread {
 	public int ACKnum;
 	public int defaultport = 8002;
 	public int tID;	
-	public Queue<MazewarPacket> inQueue;
-	private Queue<MazewarPacket> outQueue;
+	public LinkedBlockingQueue<MazewarPacket> inQueue;
+	private LinkedBlockingQueue<MazewarPacket> outQueue;
 	private Map<String, Client> players;
 	private String localID;
 
@@ -25,7 +26,7 @@ public class ClientExecutionThread extends Thread {
 	
 	
 	
-	public ClientExecutionThread (Queue<MazewarPacket> _inQueue, Queue<MazewarPacket> _outQueue, Map<String, Client> clients, String localID,  Map<String, SocketInfo> clientsconn,boolean ispaused, int ACKnum) 
+	public ClientExecutionThread (LinkedBlockingQueue<MazewarPacket> _inQueue, LinkedBlockingQueue<MazewarPacket> _outQueue, Map<String, Client> clients, String localID,  Map<String, SocketInfo> clientsconn,boolean ispaused, int ACKnum) 
 	{
 		super("ClientExecutionThread");
 		this.inQueue = _inQueue;
@@ -43,18 +44,25 @@ public class ClientExecutionThread extends Thread {
 	public void run() {
 		
 		// poll inQueue for packets, read packet, executePacket()
-MazewarPacket a = new MazewarPacket();
-			a.type = 87;
-			LocalClient.inQueue.add(a);
+		//MazewarPacket a = new MazewarPacket();
+		//a.type = 87;
+		//LocalClient.inQueue.put(a);
 		while(true){
-			
+			//while(LocalClient.inQueue.peek() == null);
+			//synchronized(this) {
 			if(LocalClient.inQueue.size() != 0) { // Something is in the queue
-				System.out.println("Inside run of executetion thread. localid = "+localID+"size "+LocalClient.inQueue.size());			
-				MazewarPacket head = LocalClient.inQueue.remove();
-				System.out.println("Inside run of executetion thread. localid = "+localID+"; packet type = "+head.type);
-
-				if(head != null) {
-					executePacket(head);
+				//System.out.println("Inside run of executetion thread. localid = "+localID+"size "+LocalClient.inQueue.size());	
+				try{
+					MazewarPacket head = LocalClient.inQueue.take();
+				
+					//if(head.type != 805)
+					//System.out.println("Inside run of executetion thread. localid = "+localID+"; packet type = "+head.type);
+				
+					if(head != null) {
+						executePacket(head);
+					}
+				} catch(InterruptedException ex) {
+					ex.printStackTrace();
 				}
 			}
 		}
@@ -123,7 +131,7 @@ MazewarPacket a = new MazewarPacket();
 					LocalClient.ticker = new MazewarTickerThread(clientsconn,localID);
 					LocalClient.ticker.start();
 					pkt.type = MazewarPacket.RING_TOKEN;
-					LocalClient.inQueue.add(pkt);
+					LocalClient.inQueue.put(pkt);
 				}
 				else{
 		    			MazewarPacket leaderpkt = new MazewarPacket();
@@ -161,6 +169,8 @@ MazewarPacket a = new MazewarPacket();
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
+			} catch(InterruptedException ex) {
+			ex.printStackTrace();
 			}
 		}
 		/*else if(pkt.type == MazewarPacket.CLIENTINFO_REQUEST){ //only leader receives this packet
@@ -257,6 +267,7 @@ MazewarPacket a = new MazewarPacket();
 			;
 		}
 		else if(pkt.type == MazewarPacket.RING_TOKEN) {
+			//System.out.println("token received. Calling sendmulticast");
 			ACKnum = 0;
 			sendmcast();
 		}
@@ -292,7 +303,7 @@ MazewarPacket a = new MazewarPacket();
 
 		try {
 			if (outQueue.size() > 0){
-				MazewarPacket outPacket = outQueue.remove();
+				MazewarPacket outPacket = outQueue.take();
 				int ACKMax = players.size() - 1;
 				Client localClient = players.get(localID);
 
@@ -357,10 +368,16 @@ MazewarPacket a = new MazewarPacket();
 			else {
 				MazewarPacket tok = new MazewarPacket();
 				tok.type = MazewarPacket.RING_TOKEN;
-				LocalClient.inQueue.add(tok);
+				try{
+					LocalClient.inQueue.put(tok);
+				} catch(InterruptedException ex) {
+					ex.printStackTrace();
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch(InterruptedException ex) {
+			ex.printStackTrace();
 		}
 	}
 
@@ -382,7 +399,7 @@ MazewarPacket a = new MazewarPacket();
 					}
 
 					Socket mcastSock = LocalClient.p2psockets.get((String)o);
-
+					//System.out.println("sending packet to client +" (String)o);
 					ObjectOutputStream outStream = new ObjectOutputStream(mcastSock.getOutputStream());
 				
 					outStream.writeObject(pkt);

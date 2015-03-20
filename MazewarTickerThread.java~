@@ -28,7 +28,7 @@ public class MazewarTickerThread extends Thread{
 			tik.type = MazewarPacket.MW_TICK;
 
 			broadcast(tik); 
-			Thread.sleep(1000);
+			Thread.sleep(200);
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -66,6 +66,6 @@ public class MazewarTickerThread extends Thread{
 			}
 		}
 
-		LocalClient.inQueue.add(currPacket);
+		LocalClient.inQueue.put(currPacket);
 	}
 } 

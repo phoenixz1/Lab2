@@ -49,5 +49,7 @@ public class MazewarPacket implements Serializable {
 	public SocketInfo newsocket = null;
 	// Name of elected party leader 
 	public String leader;
+
+
 	
-};
+}

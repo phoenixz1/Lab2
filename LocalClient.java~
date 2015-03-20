@@ -21,7 +21,7 @@ import java.lang.*;
 import java.util.*;
 import java.io.*;
 import java.net.*;
-
+import java.util.concurrent.*;
 /**
  * An abstract class for {@link Client}s in a {@link Maze} that local to the 
  * computer the game is running upon. You may choose to implement some of 
@@ -36,7 +36,7 @@ import java.net.*;
 public abstract class LocalClient extends Client {
 
 	// queue to store the incoming packets from server
-	public static final Queue<MazewarPacket> inQueue = new LinkedList<MazewarPacket>();
+	public static final BlockingQueue<MazewarPacket> inQueue = new LinkedBlockingQueue<MazewarPacket>();
 		 
 	// map of containing active players on maze (Client.name<String> --> <Client Object>)
 	public static final Map<String, Client> clients = new HashMap();
@@ -51,7 +51,7 @@ public abstract class LocalClient extends Client {
 	public static ObjectOutputStream nextclientstream = null; // <-- initializa this. used in delete
 	
 	// ***Lab3*** Queue to store outgoing packets (to be multicasted on token receive)
-	public static final Queue<MazewarPacket> outQueue = new LinkedList<MazewarPacket>();
+	public static final BlockingQueue<MazewarPacket> outQueue = new LinkedBlockingQueue<MazewarPacket>();
 	
 	public static MazewarTickerThread ticker;
 
@@ -78,8 +78,8 @@ public abstract class LocalClient extends Client {
 	// boolean flag to indicate if localclient is party leader
 	public static boolean isleader;
 
-	public static boolean ispaused;
-	public static int ACKnum;
+	public static volatile boolean ispaused;
+	public static volatile  int ACKnum;
 
         /** 
          * Create a {@link Client} local to this machine.
@@ -112,7 +112,7 @@ public abstract class LocalClient extends Client {
 		System.err.println("ERROR: Couldn't get I/O for the connection.");
 		System.exit(1);
 	    }
-	    enquethread = new ClientReceiverThread(srvSocket, inQueue);
+	    enquethread = new ClientReceiverThread(srvSocket, inQueue, inStream);
 	    dequethread = new ClientExecutionThread(inQueue, outQueue, clients, name, clientsconn, ispaused, ACKnum);
 	    listenThread = new ClientListenerThread(ownSocket, inQueue);
 	    ticker = null;

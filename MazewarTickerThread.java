@@ -65,7 +65,10 @@ public class MazewarTickerThread extends Thread{
 				}
 			}
 		}
-
-		LocalClient.inQueue.add(currPacket);
+		try{
+			LocalClient.inQueue.put(currPacket);
+		} catch(InterruptedException ex) {
+			ex.printStackTrace();
+		}
 	}
 } 

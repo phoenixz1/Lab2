@@ -2,15 +2,16 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 import java.net.*;
+import java.util.concurrent.*;
 
 public class ClientReceiverThread extends Thread {
 
 
 	public Socket socket = null;
 	public ObjectInputStream inStream;
-	private Queue<MazewarPacket> inQueue;
+	private LinkedBlockingQueue<MazewarPacket> inQueue;
 
-	public ClientReceiverThread (Socket socket, Queue<MazewarPacket> incomingQueue, ObjectInputStream inStream) 
+	public ClientReceiverThread (Socket socket, LinkedBlockingQueue<MazewarPacket> incomingQueue, ObjectInputStream inStream) 
 	{
 		super("ClientReceiverThread");
 		this.socket = socket;
@@ -34,19 +35,19 @@ public class ClientReceiverThread extends Thread {
 			    	LocalClient.ACKnum++;
 			else if(packetFromServer.type == MazewarPacket.RING_PAUSE) {
 				LocalClient.p2psockets.put(packetFromServer.cID, this.socket);
-				inQueue.add(packetFromServer);			
+				inQueue.put(packetFromServer);			
 			}
 			else if(packetFromServer.type == MazewarPacket.RING_INFO){
 				ricounter++;
-				inQueue.add(packetFromServer);
+				inQueue.put(packetFromServer);
 				if(ricounter == LocalClient.p2psockets.size()) {
 					MazewarPacket np = new MazewarPacket();
 					np.type = MazewarPacket.MCAST_REQ;
-					inqueue.add(np);
+					inQueue.put(np);
 				}
 			}
 		    	else { 
-				inQueue.add(packetFromServer);
+				inQueue.put(packetFromServer);
 				System.out.println("queued packet. Queue size = "+LocalClient.inQueue.size());
                     	}
 		}
