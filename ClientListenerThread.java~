@@ -22,22 +22,21 @@ public class ClientListenerThread extends Thread {
 		
 		// Listen for new clients trying to join the game session
 		// If a client wants to connect, create a new ClientReceiverThread for that client
-		try {
-			while (!Thread.interrupted()) {
-				
+		while (!Thread.interrupted()) {
+			try {
 				connSocket = listenSocket.accept();
 				connInStream = new ObjectInputStream(connSocket.getInputStream());
-				connOutStream = new ObjectOutputStream(connSocket.getOutputStream()); 
-			
-				new ClientReceiverThread(connSocket, inQueue, connInStream).start();
-			}
-
-			connInStream.close();
-			connSocket.close();
-			listenSocket.close();
-		} catch (IOException e) {
+				connOutStream = new ObjectOutputStream(connSocket.getOutputStream());
+			} catch (IOException e) {
 				System.err.println("ERROR: Couldn't get I/O for the naming server connection.");
 				System.exit(1);
+			}
+			
+			new ClientReceiverThread(connSocket, inQueue, connInStream).start();
 		}
+
+		connInStream.close();
+		connSocket.close();
+		listenSocket.close();
 	}
 }

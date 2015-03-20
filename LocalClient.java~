@@ -112,7 +112,7 @@ public abstract class LocalClient extends Client {
 		System.err.println("ERROR: Couldn't get I/O for the connection.");
 		System.exit(1);
 	    }
-	    enquethread = new ClientReceiverThread(srvSocket, inQueue, inStream);
+	    enquethread = new ClientReceiverThread(srvSocket, inQueue);
 	    dequethread = new ClientExecutionThread(inQueue, outQueue, clients, name, clientsconn, ispaused, ACKnum);
 	    listenThread = new ClientListenerThread(ownSocket, inQueue);
 	    ticker = null;

@@ -42,7 +42,7 @@ public class ClientReceiverThread extends Thread {
 				if(ricounter == LocalClient.p2psockets.size()) {
 					MazewarPacket np = new MazewarPacket();
 					np.type = MazewarPacket.MCAST_REQ;
-					inQueue.add(np);
+					inqueue.add(np);
 				}
 			}
 		    	else { 
