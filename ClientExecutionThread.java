@@ -307,7 +307,7 @@ public class ClientExecutionThread extends Thread {
 				int ACKMax = players.size() - 1;
 				Client localClient = players.get(localID);
 
-				if (!clientsconn.isEmpty()){
+				if (!players.isEmpty()){
 					Iterator i = LocalClient.p2psockets.keySet().iterator();
 		
 					while (i.hasNext()){
@@ -333,6 +333,12 @@ public class ClientExecutionThread extends Thread {
 				while(ACKnum < ACKMax) ;
 
 				// All ACK's received; process the key event on the local client
+
+				// Check if the local client is quitting or not
+				if(outPacket.type == MazewarPacket.MW_BYE) {
+				    Mazewar.quit();
+				}
+
 				KeyEvent e = outPacket.event;
 
 				// Up-arrow moves forward.
@@ -386,7 +392,7 @@ public class ClientExecutionThread extends Thread {
 		// send RING_STOP and RING_RESUME
 
 		try {
-			if (!clientsconn.isEmpty()){
+			if (!players.isEmpty()){
 				Iterator i = LocalClient.p2psockets.keySet().iterator();
 	
 				while (i.hasNext()){
@@ -418,18 +424,13 @@ public class ClientExecutionThread extends Thread {
 	    ackPkt.type = MazewarPacket.ACK;
 
 	    // Create a socket to obtain the info on the destination
-	    SocketInfo destInfo = clientsconn.get(client);
+	    Socket destSock = LocalClient.p2psockets.get(client);
 
 	    try {
-		    Socket destSock = new Socket(destInfo.getInetAddress(), destInfo.getPort());
-
 		    ObjectOutputStream destOutStream = new ObjectOutputStream(destSock.getOutputStream());
 
 		    destOutStream.writeObject(ackPkt);
-
-
 		    destOutStream.close();
-		    destSock.close();
 	    } catch (IOException e) {
 		    e.printStackTrace();
 	    }

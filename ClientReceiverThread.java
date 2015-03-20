@@ -10,6 +10,7 @@ public class ClientReceiverThread extends Thread {
 	public Socket socket = null;
 	public ObjectInputStream inStream;
 	private LinkedBlockingQueue<MazewarPacket> inQueue;
+        public static boolean isRunning = false;
 
 	public ClientReceiverThread (Socket socket, LinkedBlockingQueue<MazewarPacket> incomingQueue, ObjectInputStream inStream) 
 	{
@@ -25,7 +26,7 @@ public class ClientReceiverThread extends Thread {
 	    MazewarPacket packetFromServer;
 	    int ricounter = 0;
 	    try {
-		while ((packetFromServer = (MazewarPacket) inStream.readObject()) != null) {
+		while ((packetFromServer = (MazewarPacket) inStream.readObject()) != null && isRunning) {
 		    System.out.println("receives a packet of type "+packetFromServer.type);
 		    // check acks and unpauses; ACK and RING_UNPAUSE packets are not queued
 		    //synchronized(this) {
@@ -65,4 +66,7 @@ public class ClientReceiverThread extends Thread {
 	    }
 	}
 
+        public static void terminate() {
+	    isRunning = false;
+        }
 }

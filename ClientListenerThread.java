@@ -8,6 +8,7 @@ public class ClientListenerThread extends Thread {
 	
 	public ServerSocket listenSocket = null;
 	private LinkedBlockingQueue<MazewarPacket> inQueue;
+        public static boolean isRunning = false;
 	
 	public ClientListenerThread (ServerSocket locSocket, LinkedBlockingQueue<MazewarPacket> incomingQueue){
 		super("ClientListenerThread");
@@ -24,7 +25,7 @@ public class ClientListenerThread extends Thread {
 		// Listen for new clients trying to join the game session
 		// If a client wants to connect, create a new ClientReceiverThread for that client
 		try {
-			while (!Thread.interrupted()) {
+			while (isRunning) {
 				
 				connSocket = listenSocket.accept();
 				connInStream = new ObjectInputStream(connSocket.getInputStream());
@@ -41,4 +42,8 @@ public class ClientListenerThread extends Thread {
 				System.exit(1);
 		}
 	}
+
+        public static void terminate() {
+	    isRunning = false;
+        }
 }
