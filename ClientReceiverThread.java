@@ -51,13 +51,16 @@ public class ClientReceiverThread extends Thread {
 		    //synchronized(this) {
 		    	if(packetFromServer.type == MazewarPacket.RING_UNPAUSE)
 		    		LocalClient.ispaused = false;
+
 		    	else if(packetFromServer.type == MazewarPacket.ACK)
 			    	LocalClient.ACKnum++;
+
 			else if(packetFromServer.type == MazewarPacket.RING_PAUSE) {
 				LocalClient.p2psockets.put(packetFromServer.cID, this.socket);
 				inQueue.put(packetFromServer);			
 				LocalClient.p2pthreads.put(packetFromServer.cID, this);
 			}
+
 			else if(packetFromServer.type == MazewarPacket.RING_INFO){
 				ricounter++;
 				inQueue.put(packetFromServer);

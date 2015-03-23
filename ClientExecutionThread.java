@@ -226,7 +226,7 @@ public class ClientExecutionThread extends Thread {
 		}
 		else if(pkt.type == MazewarPacket.RING_PAUSE) { //non-leader clients get this
 			
-				ispaused = true;
+				LocalClient.ispaused = true;
 			
 				//add new client to all maps
 				c = players.get(localID);
@@ -259,7 +259,7 @@ public class ClientExecutionThread extends Thread {
 
 		
 				//outStream.close(); 
-				while(ispaused);
+				while(LocalClient.ispaused);
 			
 		}
 		else if(pkt.type == MazewarPacket.RING_UNPAUSE) { 
@@ -267,7 +267,7 @@ public class ClientExecutionThread extends Thread {
 		}
 		else if(pkt.type == MazewarPacket.RING_TOKEN) {
 			//System.out.println("token received. Calling sendmulticast");
-			ACKnum = 0;
+			LocalClient.ACKnum = 0;
 			sendmcast();
 		}
 		else if(pkt.type == MazewarPacket.MW_ELECTION) {
@@ -307,7 +307,7 @@ public class ClientExecutionThread extends Thread {
 				Client localClient = players.get(localID);
 
 				if (!clientsconn.isEmpty()){
-					Iterator i = LocalClient.p2psockets.keySet().iterator();
+					Iterator i = LocalClient.p2pthreads.keySet().iterator();
 		
 					while (i.hasNext()){
 						Object o = i.next();
@@ -331,7 +331,7 @@ public class ClientExecutionThread extends Thread {
 			       }
 
 				// Wait until all ACK's are received
-				while(ACKnum < ACKMax) ;
+				while(LocalClient.ACKnum < ACKMax) ;
 
 				// All ACK's received; process the key event on the local client
 				KeyEvent e = outPacket.event;
@@ -358,7 +358,7 @@ public class ClientExecutionThread extends Thread {
 				// Event processed; send RING_TOKEN to next client in the ring
 				MazewarPacket ringPacket = new MazewarPacket();
 				ringPacket.type = MazewarPacket.RING_TOKEN;
-
+				System.out.println("sending token to " + LocalClient.nextclient);
 				LocalClient.p2pthreads.get(LocalClient.nextclient).send(ringPacket);
 
 				//ObjectOutputStream nextOutStream = new ObjectOutputStream(LocalClient.nextclientSkt.getOutputStream());
@@ -389,7 +389,7 @@ public class ClientExecutionThread extends Thread {
 
 		
 			if (!clientsconn.isEmpty()){
-				Iterator i = LocalClient.p2psockets.keySet().iterator();
+				Iterator i = LocalClient.p2pthreads.keySet().iterator();
 	
 				while (i.hasNext()){
 					Object o = i.next();
