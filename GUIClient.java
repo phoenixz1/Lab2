@@ -49,21 +49,22 @@ public class GUIClient extends LocalClient implements KeyListener {
                 
                 if((e.getKeyChar() == 'q') || (e.getKeyChar() == 'Q')) {
 			if(this.isleader == true && LocalClient.clients.size() > 1) {
-				try{
+				//try{
 				// send MW_ELECTION packet to the next client
-				ObjectOutputStream nextstream = new ObjectOutputStream(LocalClient.nextclientSkt.getOutputStream());
+				//ObjectOutputStream nextstream = new ObjectOutputStream(LocalClient.nextclientSkt.getOutputStream());
 				MazewarPacket electionPkt = new MazewarPacket();
 				electionPkt.type = MazewarPacket.MW_ELECTION;
-				electionPkt.newsocket = new SocketInfo(LocalClient.nextclientSkt.getInetAddress(), LocalClient.nextclientSkt.getPort());
-				if(nextclientstream != null) {
-					
-						nextstream.writeObject(electionPkt);
-						nextstream.close();
+				electionPkt.nextclient = this.nextclient;
+				if(this.nextclient != null) {
+						
+						this.p2pthreads.get(nextclient).send(electionPkt);
+						//nextstream.writeObject(electionPkt);
+						//nextstream.close();
 					
 				}
-				} catch (IOException ex) {
-					ex.printStackTrace();
-				}
+				//} catch (IOException ex) {
+				//	ex.printStackTrace();
+				//}
 				// stop tickerthread
 				LocalClient.ticker.interrupt();		
 			}

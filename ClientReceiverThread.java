@@ -9,6 +9,7 @@ public class ClientReceiverThread extends Thread {
 
 	public Socket socket = null;
 	public ObjectInputStream inStream;
+	public ObjectOutputStream outStream;
 	private LinkedBlockingQueue<MazewarPacket> inQueue;
 
 	public ClientReceiverThread (Socket socket, LinkedBlockingQueue<MazewarPacket> incomingQueue) 
@@ -17,9 +18,25 @@ public class ClientReceiverThread extends Thread {
 		this.socket = socket;
 		this.inQueue = incomingQueue;
 		try {
+			this.outStream = new ObjectOutputStream(socket.getOutputStream()); 
 			this.inStream = new ObjectInputStream(socket.getInputStream());
 		} catch(IOException ex) {
 			ex.printStackTrace();
+		}
+	}
+
+
+	public ClientReceiverThread (Socket socket, LinkedBlockingQueue<MazewarPacket> incomingQueue, boolean isserver) 
+	{
+		super("ClientReceiverThread");
+		if(isserver) {
+		this.socket = socket;
+		this.inQueue = incomingQueue;
+		try {
+			this.inStream = new ObjectInputStream(socket.getInputStream());
+		} catch(IOException ex) {
+			ex.printStackTrace();
+		}
 		}
 	}
 	
@@ -39,6 +56,7 @@ public class ClientReceiverThread extends Thread {
 			else if(packetFromServer.type == MazewarPacket.RING_PAUSE) {
 				LocalClient.p2psockets.put(packetFromServer.cID, this.socket);
 				inQueue.put(packetFromServer);			
+				LocalClient.p2pthreads.put(packetFromServer.cID, this);
 			}
 			else if(packetFromServer.type == MazewarPacket.RING_INFO){
 				ricounter++;
@@ -67,5 +85,13 @@ public class ClientReceiverThread extends Thread {
 		ex.printStackTrace();
 	    }
 	}
-
+	
+	public void send(MazewarPacket pkt) {
+		try {		
+			this.outStream.writeObject(pkt);
+		}
+		catch(IOException ex) {
+			ex.printStackTrace();
+		}
+	}
 }

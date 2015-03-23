@@ -50,6 +50,7 @@ public class MazewarPacket implements Serializable {
 	// Name of elected party leader 
 	public String leader;
 
+	public String nextclient = null;
 
 	
 }

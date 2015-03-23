@@ -45,9 +45,13 @@ public abstract class LocalClient extends Client {
 	public static final Map<String, SocketInfo> clientsconn = new HashMap();
 
 	public static final Map<String, Socket> p2psockets = new HashMap();
+
+	public static final Map<String, ClientReceiverThread> p2pthreads = new HashMap();
 	
 	// ***Lab3*** Socket to communicate to the next client in the ring
 	public static Socket nextclientSkt = null;
+	public static String nextclient = null;
+
 	public static ObjectOutputStream nextclientstream = null; // <-- initializa this. used in delete
 	
 	// ***Lab3*** Queue to store outgoing packets (to be multicasted on token receive)
@@ -112,7 +116,7 @@ public abstract class LocalClient extends Client {
 		System.err.println("ERROR: Couldn't get I/O for the connection.");
 		System.exit(1);
 	    }
-	    enquethread = new ClientReceiverThread(srvSocket, inQueue);
+	    enquethread = new ClientReceiverThread(srvSocket, inQueue, true);
 	    dequethread = new ClientExecutionThread(inQueue, outQueue, clients, name, clientsconn, ispaused, ACKnum);
 	    listenThread = new ClientListenerThread(ownSocket, inQueue);
 	    ticker = null;

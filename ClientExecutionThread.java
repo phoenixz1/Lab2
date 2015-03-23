@@ -18,9 +18,7 @@ public class ClientExecutionThread extends Thread {
 
 	// ***Lab3*** map containing connections to all clients
 	public  Map<String, SocketInfo> clientsconn;
-	
-	// ***Lab3*** Socket to communicate to the next client in the ring
-	// Socket nextclientSkt = null;
+
 
 
 	
@@ -103,9 +101,9 @@ public class ClientExecutionThread extends Thread {
 				// tell server a client has quit
 					LocalClient.outStream.writeObject(pkt);
 				}
-				if(LocalClient.nextclientSkt.getInetAddress().toString().equals(clientsconn.get(pkt.cID).getInetAddress().toString())) {
+				if(LocalClient.nextclient.equals(pkt.cID)) {
 				// update the next player
-					LocalClient.nextclientSkt = new Socket(pkt.newsocket.getInetAddress(),pkt.newsocket.getPort());
+					LocalClient.nextclient = pkt.nextclient;
 				}
 				players.remove(pkt.cID);
 				clientsconn.remove(pkt.cID);
@@ -127,7 +125,6 @@ public class ClientExecutionThread extends Thread {
 	       		     	// SocketInfo clientsocket = new SocketInfo(InetAddress.getLocalHost(), defaultport); //local hostname and desired port of self
 				if(clientsconn.isEmpty()){
 					LocalClient.isleader = true;
-					LocalClient.nextclientSkt = null;
 					LocalClient.ticker = new MazewarTickerThread(clientsconn,localID);
 					LocalClient.ticker.start();
 					pkt.type = MazewarPacket.RING_TOKEN;
@@ -149,21 +146,24 @@ public class ClientExecutionThread extends Thread {
 					while (i.hasNext()){
 						Object o = i.next();
 						assert (o instanceof String);
-
-						SocketInfo s = clientsconn.get((String)o);
+						String clname = (String) o;
+						SocketInfo s = clientsconn.get(clname);
 
 
 						Socket socket = new Socket(s.getInetAddress(),defaultport);
-						LocalClient.p2psockets.put((String)o, socket);
+						LocalClient.p2psockets.put(clname, socket);
 						if(((String)o).equals(pkt.leader)){
-							LocalClient.nextclientSkt = socket;
+							LocalClient.nextclient = pkt.leader;
+							//LocalClient.nextclientSkt = socket;
 						}
 						//ObjectInputStream newinStream = new ObjectInputStream(socket.getInputStream());
 						ClientReceiverThread receivethread = new ClientReceiverThread(socket, inQueue);
+						LocalClient.p2pthreads.put(clname, receivethread);
 						receivethread.start();
-						ObjectOutputStream newoutStream = new ObjectOutputStream(socket.getOutputStream());	
-						newoutStream.writeObject(leaderpkt);
-						newoutStream.close();
+						receivethread.send(leaderpkt);
+						//ObjectOutputStream newoutStream = new ObjectOutputStream(socket.getOutputStream());	
+						//newoutStream.writeObject(leaderpkt);
+						//newoutStream.close();
 					}
 
 				}
@@ -225,7 +225,7 @@ public class ClientExecutionThread extends Thread {
 			
 		}
 		else if(pkt.type == MazewarPacket.RING_PAUSE) { //non-leader clients get this
-			try {
+			
 				ispaused = true;
 			
 				//add new client to all maps
@@ -235,12 +235,10 @@ public class ClientExecutionThread extends Thread {
 				c.maze.addRemoteClient(newClient, pkt.StartPoint, new Direction(pkt.dir));
 
 				//add new client to ring
-				if(LocalClient.nextclientSkt == null){
-					LocalClient.nextclientSkt = LocalClient.p2psockets.get(pkt.cID);
-					}
-				SocketInfo leaderinfo = clientsconn.get(pkt.leader);
-				if(((LocalClient.nextclientSkt.getInetAddress()).toString()).equals((leaderinfo.getInetAddress()).toString())){
-					LocalClient.nextclientSkt = LocalClient.p2psockets.get(pkt.cID);
+				
+				//SocketInfo leaderinfo = clientsconn.get(pkt.leader);
+				if(LocalClient.nextclient == null || (LocalClient.nextclient).equals(pkt.leader)){
+					LocalClient.nextclient = pkt.cID;
 
 				}
 			
@@ -252,16 +250,17 @@ public class ClientExecutionThread extends Thread {
 				ackpkt.StartPoint = c.getPoint();
 		       		ackpkt.dir = c.getOrientation().toString();
 				ackpkt.leader = pkt.leader;
-				ObjectOutputStream outStream = new ObjectOutputStream(LocalClient.p2psockets.get(pkt.cID).getOutputStream());
 
-				outStream.writeObject(ackpkt);
+
+				LocalClient.p2pthreads.get(pkt.cID).send(ackpkt);
+				//ObjectOutputStream outStream = new ObjectOutputStream(LocalClient.p2psockets.get(pkt.cID).getOutputStream());
+
+				//outStream.writeObject(ackpkt);
 
 		
-				outStream.close(); 
+				//outStream.close(); 
 				while(ispaused);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			
 		}
 		else if(pkt.type == MazewarPacket.RING_UNPAUSE) { 
 			;
@@ -318,14 +317,16 @@ public class ClientExecutionThread extends Thread {
 						if (((String)o).equals(localID)) {
 						    continue;
 						}
+		
+						LocalClient.p2pthreads.get((String)o).send(outPacket);
 
-						Socket mcastSock = LocalClient.p2psockets.get((String)o);
+						//Socket mcastSock = LocalClient.p2psockets.get((String)o);
 
-						ObjectOutputStream outStream = new ObjectOutputStream(mcastSock.getOutputStream());
+						//ObjectOutputStream outStream = new ObjectOutputStream(mcastSock.getOutputStream());
 					
-						outStream.writeObject(outPacket);
+						//outStream.writeObject(outPacket);
 
-						outStream.close();
+						//outStream.close();
 					}
 			       }
 
@@ -358,12 +359,14 @@ public class ClientExecutionThread extends Thread {
 				MazewarPacket ringPacket = new MazewarPacket();
 				ringPacket.type = MazewarPacket.RING_TOKEN;
 
-				ObjectOutputStream nextOutStream = new ObjectOutputStream(LocalClient.nextclientSkt.getOutputStream());
+				LocalClient.p2pthreads.get(LocalClient.nextclient).send(ringPacket);
 
-				nextOutStream.writeObject(ringPacket);
+				//ObjectOutputStream nextOutStream = new ObjectOutputStream(LocalClient.nextclientSkt.getOutputStream());
+
+				//nextOutStream.writeObject(ringPacket);
 
 
-				nextOutStream.close();
+				//nextOutStream.close();
 			}
 			else {
 				MazewarPacket tok = new MazewarPacket();
@@ -374,8 +377,7 @@ public class ClientExecutionThread extends Thread {
 					ex.printStackTrace();
 				}
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		
 		} catch(InterruptedException ex) {
 			ex.printStackTrace();
 		}
@@ -385,7 +387,7 @@ public class ClientExecutionThread extends Thread {
 		// Special multicast to be used only by leader
 		// send RING_STOP and RING_RESUME
 
-		try {
+		
 			if (!clientsconn.isEmpty()){
 				Iterator i = LocalClient.p2psockets.keySet().iterator();
 	
@@ -398,41 +400,26 @@ public class ClientExecutionThread extends Thread {
 					    continue;
 					}
 
-					Socket mcastSock = LocalClient.p2psockets.get((String)o);
-					//System.out.println("sending packet to client +" (String)o);
-					ObjectOutputStream outStream = new ObjectOutputStream(mcastSock.getOutputStream());
-				
-					outStream.writeObject(pkt);
+					LocalClient.p2pthreads.get((String)o).send(pkt);
 
-					outStream.close();
+					//Socket mcastSock = LocalClient.p2psockets.get((String)o);
+					//System.out.println("sending packet to client +" (String)o);
+					//ObjectOutputStream outStream = new ObjectOutputStream(mcastSock.getOutputStream());
+				
+					//outStream.writeObject(pkt);
+
+					//outStream.close();
 				}
 		       }
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	
 	}
 
 	public void sendack (String client) {
 	    // Create an acknowledgement packet
 	    MazewarPacket ackPkt = new MazewarPacket();
 	    ackPkt.type = MazewarPacket.ACK;
+	    LocalClient.p2pthreads.get(client).send(ackPkt);
 
-	    // Create a socket to obtain the info on the destination
-	    SocketInfo destInfo = clientsconn.get(client);
-
-	    try {
-		    Socket destSock = new Socket(destInfo.getInetAddress(), destInfo.getPort());
-
-		    ObjectOutputStream destOutStream = new ObjectOutputStream(destSock.getOutputStream());
-
-		    destOutStream.writeObject(ackPkt);
-
-
-		    destOutStream.close();
-		    destSock.close();
-	    } catch (IOException e) {
-		    e.printStackTrace();
-	    }
 	}
 
 }
