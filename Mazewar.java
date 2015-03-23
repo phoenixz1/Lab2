@@ -115,9 +115,6 @@ public class Mazewar extends JFrame {
                 // (inform other implementations on the network that you have 
                 //  left, etc.)
                 
-	        // Terminate the listener and receiver threads, which will close the sockets and input streams in the process
-      	        ClientReceiverThread.terminate();
-		ClientListenerThread.terminate();
 
                 System.exit(0);
         }

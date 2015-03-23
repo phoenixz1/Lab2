@@ -102,7 +102,7 @@ public abstract class LocalClient extends Client {
 		ownSocket = new ServerSocket(defaultport);
             	System.out.println("Socket created.");
             	outStream = new ObjectOutputStream(srvSocket.getOutputStream());
-            	//inStream = new ObjectInputStream(srvSocket.getInputStream());
+            	inStream = new ObjectInputStream(srvSocket.getInputStream());
 
 		System.out.println("Socket & input stream created.");
             } catch (UnknownHostException e) {
@@ -112,7 +112,7 @@ public abstract class LocalClient extends Client {
 		System.err.println("ERROR: Couldn't get I/O for the connection.");
 		System.exit(1);
 	    }
-	    enquethread = new ClientReceiverThread(srvSocket, inQueue);
+	    enquethread = new ClientReceiverThread(srvSocket, inQueue, inStream);
 	    dequethread = new ClientExecutionThread(inQueue, outQueue, clients, name, clientsconn, ispaused, ACKnum);
 	    listenThread = new ClientListenerThread(ownSocket, inQueue);
 	    ticker = null;

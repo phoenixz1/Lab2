@@ -27,14 +27,13 @@ public class ClientListenerThread extends Thread {
 			while (!Thread.interrupted()) {
 				
 				connSocket = listenSocket.accept();
-				
+				connInStream = new ObjectInputStream(connSocket.getInputStream());
 				connOutStream = new ObjectOutputStream(connSocket.getOutputStream()); 
-				//connInStream = new ObjectInputStream(connSocket.getInputStream());
 				System.out.println("Inside listener, creating new thread");
-				new ClientReceiverThread(connSocket, inQueue).start();
+				new ClientReceiverThread(connSocket, inQueue, connInStream).start();
 			}
 
-			//connInStream.close();
+			connInStream.close();
 			connSocket.close();
 			listenSocket.close();
 		} catch (IOException e) {
