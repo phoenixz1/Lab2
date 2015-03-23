@@ -21,12 +21,17 @@ public class ClientListenerThread extends Thread {
 		Socket connSocket = null;
 		ObjectInputStream connInStream = null;
 		ObjectOutputStream connOutStream = null;
-		
+
+		System.out.println("Inside listener p1");
+		isRunning = true;
 		// Listen for new clients trying to join the game session
 		// If a client wants to connect, create a new ClientReceiverThread for that client
 		try {
+			ServerSocket listenSocket = new ServerSocket(5500);
+			System.out.println("Inside listener, CREATED NEW SRVSOCKET");
+
 			while (isRunning) {
-				
+				System.out.println("Inside listener, entered while loop");
 				connSocket = listenSocket.accept();
 				connInStream = new ObjectInputStream(connSocket.getInputStream());
 				connOutStream = new ObjectOutputStream(connSocket.getOutputStream()); 
