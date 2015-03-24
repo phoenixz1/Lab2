@@ -32,7 +32,7 @@ public class MazewarPacket implements Serializable {
 	public int type = MW_NULL;
 	
 	// Client name
-	public String cID;
+	public String cID = null;
 	
 	// Key event
 	public KeyEvent event = null;	
@@ -48,7 +48,7 @@ public class MazewarPacket implements Serializable {
 	
 	public SocketInfo newsocket = null;
 	// Name of elected party leader 
-	public String leader;
+        public String leader = null;
 
 	public String nextclient = null;
 

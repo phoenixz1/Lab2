@@ -11,6 +11,7 @@ public class ClientReceiverThread extends Thread {
 	public ObjectInputStream inStream;
 	public ObjectOutputStream outStream;
 	private LinkedBlockingQueue<MazewarPacket> inQueue;
+        public static boolean isRunning = true;
 
 	public ClientReceiverThread (Socket socket, LinkedBlockingQueue<MazewarPacket> incomingQueue) 
 	{
@@ -45,7 +46,7 @@ public class ClientReceiverThread extends Thread {
 	    MazewarPacket packetFromServer;
 	    int ricounter = 0;
 	    try {
-		while ((packetFromServer = (MazewarPacket) inStream.readObject()) != null) {
+		while (((packetFromServer = (MazewarPacket) inStream.readObject()) != null) && isRunning) {
 		    System.out.println("receives a packet of type "+packetFromServer.type);
 		    // check acks and unpauses; ACK and RING_UNPAUSE packets are not queued
 		    //synchronized(this) {
@@ -75,9 +76,10 @@ public class ClientReceiverThread extends Thread {
 				System.out.println("queued packet. Queue size = "+LocalClient.inQueue.size());
                     	}
 		}
-		// connection ended
-                 inStream.close();
-                 socket.close();
+		//Close the streams and socket
+		inStream.close();
+		outStream.close();
+		socket.close();
 	    } catch (IOException e) {
 		 System.err.println("ERROR: Couldn't get I/O for the connection.");
 		 System.exit(1);
@@ -96,5 +98,9 @@ public class ClientReceiverThread extends Thread {
 		catch(IOException ex) {
 			ex.printStackTrace();
 		}
+	}
+
+        public static void terminate(){
+	    isRunning = false;
 	}
 }

@@ -114,7 +114,9 @@ public class Mazewar extends JFrame {
                 // Put any network clean-up code you might have here.
                 // (inform other implementations on the network that you have 
                 //  left, etc.)
-                
+
+	        ClientReceiverThread.terminate();
+		ClientListenerThread.terminate();
 
                 System.exit(0);
         }

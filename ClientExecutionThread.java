@@ -334,6 +334,10 @@ public class ClientExecutionThread extends Thread {
 				while(LocalClient.ACKnum < ACKMax) ;
 
 				// All ACK's received; process the key event on the local client
+				if (outPacket.type == MazewarPacket.MW_BYE){
+				    Mazewar.quit();
+				}
+
 				KeyEvent e = outPacket.event;
 
 				// Up-arrow moves forward.

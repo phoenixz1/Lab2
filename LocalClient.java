@@ -127,8 +127,6 @@ public abstract class LocalClient extends Client {
 	    enquethread.start();
 	    dequethread.start();
 	    listenThread.start();
-	}
-
-		
+	}		
 
 }
