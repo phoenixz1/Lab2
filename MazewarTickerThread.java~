@@ -27,7 +27,7 @@ public class MazewarTickerThread extends Thread{
 			while(notinterrupted){
 			MazewarPacket tik =  new MazewarPacket();
 			tik.type = MazewarPacket.MW_TICK;
-			LocalClient.inQueue.put(tik);
+			LocalClient.inQueue.put(currPacket);
 			ClientExecutionThread.sendmcast(tik); 
 			Thread.sleep(200);
 			}

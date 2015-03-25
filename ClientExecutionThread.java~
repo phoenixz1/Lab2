@@ -388,6 +388,13 @@ public class ClientExecutionThread extends Thread {
 
 					LocalClient.p2pthreads.get((String)o).send(pkt);
 
+					//Socket mcastSock = LocalClient.p2psockets.get((String)o);
+					//System.out.println("sending packet to client +" (String)o);
+					//ObjectOutputStream outStream = new ObjectOutputStream(mcastSock.getOutputStream());
+				
+					//outStream.writeObject(pkt);
+
+					//outStream.close();
 				}
 		       }
 	

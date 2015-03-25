@@ -58,9 +58,13 @@ public class GUIClient extends LocalClient implements KeyListener {
 				if(this.nextclient != null) {
 						
 						this.p2pthreads.get(nextclient).send(electionPkt);
+						//nextstream.writeObject(electionPkt);
+						//nextstream.close();
 					
 				}
-				
+				//} catch (IOException ex) {
+				//	ex.printStackTrace();
+				//}
 				// stop tickerthread
 				LocalClient.ticker.notinterrupted = false;		
 			}

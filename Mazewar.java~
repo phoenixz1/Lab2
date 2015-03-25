@@ -115,8 +115,7 @@ public class Mazewar extends JFrame {
                 // (inform other implementations on the network that you have 
                 //  left, etc.)
 
-	        //LocalClient.enquethread.interrupt();
-		LocalClient.enquethread.terminate();
+	        LocalClient.enquethread.interrupt();
 		ClientListenerThread.terminate();
 
                 System.exit(0);

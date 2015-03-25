@@ -85,7 +85,7 @@ public class ClientReceiverThread extends Thread {
 	    } catch (IOException e) {
 		 System.err.println("ERROR: Couldn't get I/O for the connection.");
 		 e.printStackTrace();
-		// System.exit(1);
+		 System.exit(1);
 		return;
 	    } catch (ClassNotFoundException e) {
 		 System.err.println("ERROR: Cannot find the class.");
