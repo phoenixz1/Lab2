@@ -52,7 +52,5 @@ public class MazewarPacket implements Serializable {
 
 	public String nextclient = null;
 
-	public int score = 0;
-
 	
 }

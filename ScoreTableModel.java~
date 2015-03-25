@@ -242,7 +242,7 @@ public class ScoreTableModel implements TableModel, MazeListener {
 	public void setScore(Client client,int score){
 		Object o = clientMap.get(client);
                 assert(o instanceof ScoreWrapper);
-		o.setScore(score);
+		o.adjustScore(
 	}
 
         private void notifyListeners() {

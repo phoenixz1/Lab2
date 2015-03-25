@@ -219,6 +219,7 @@ public class ClientExecutionThread extends Thread {
 				ackpkt.cID = localID;
 				//c = players.get(localID);
 				c = LocalClient.clients.get(localID);
+				ackpkt.score = clientMap.
 				ackpkt.StartPoint = c.getPoint();
 		       		ackpkt.dir = c.getOrientation().toString();
 				ackpkt.leader = pkt.leader;
