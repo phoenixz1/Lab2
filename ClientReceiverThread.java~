@@ -21,9 +21,7 @@ public class ClientReceiverThread extends Thread {
 		this.inQueue = incomingQueue;
 		try {
 			this.outStream = new ObjectOutputStream(socket.getOutputStream()); 
-			this.outStream.reset();
 			this.inStream = new ObjectInputStream(socket.getInputStream());
-			
 		} catch(IOException ex) {
 			ex.printStackTrace();
 		}

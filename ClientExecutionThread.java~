@@ -295,7 +295,7 @@ public class ClientExecutionThread extends Thread {
 				
 
 				KeyEvent e = outPacket.event;
-				if(e != null) {
+
 				// Up-arrow moves forward.
 				if(e.getKeyCode() == KeyEvent.VK_UP) {
 				        localClient.forward();
@@ -314,7 +314,6 @@ public class ClientExecutionThread extends Thread {
 				} else if (outPacket.type == MazewarPacket.MW_BYE){			            
 				    //Mazewar.quit();
 				    System.exit(1);
-				}
 				}
 			}
 
