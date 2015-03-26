@@ -175,7 +175,7 @@ public class Mazewar extends JFrame {
 		        MazewarPacket PackFromServ;
 		        
 		        // Create the GUI client
-		        guiClient = new GUIClient(name,localType,host,port_num);
+		        guiClient = new GUIClient(name,localType,host,port_num,scoreModel);
 
 			System.out.println("guis");
 		        maze.addClient(guiClient);

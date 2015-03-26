@@ -41,6 +41,8 @@ public abstract class LocalClient extends Client {
 	// map of containing active players on maze (Client.name<String> --> <Client Object>)
 	public static final Map<String, Client> clients = new HashMap();
 
+        public static ScoreTableModel scoreModel = null;
+
 	// ***Lab3*** map containing connections to all clients
 	public static final Map<String, SocketInfo> clientsconn = new HashMap();
 
@@ -85,6 +87,10 @@ public abstract class LocalClient extends Client {
 	public static volatile boolean ispaused;
 	public static volatile  int ACKnum;
 
+        public LocalClient(String name, int ctype, String host, int port){
+	    super(name, ctype);
+        }
+
         /** 
          * Create a {@link Client} local to this machine.
          * @param name The name of this {@link Client}.
@@ -92,7 +98,7 @@ public abstract class LocalClient extends Client {
          * @param port The port number of the Mazewar server
          */
 
-        public LocalClient(String name, int ctype, String host, int port_num) {
+        public LocalClient(String name, int ctype, String host, int port_num, ScoreTableModel scModel) {
             super(name, ctype);
             assert(name != null);
             
@@ -100,6 +106,8 @@ public abstract class LocalClient extends Client {
             port = port_num;
 	    ispaused = false;
 	    ACKnum = 0;
+
+	    scoreModel = scModel;
             try {
             	// Initialize the socket to the server's host name and port #
             	srvSocket = new Socket(hostname,port);

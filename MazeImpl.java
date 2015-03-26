@@ -375,6 +375,20 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                 update();
                 notifyClientAdd(client);
         }
+
+        public synchronized void addRemoteClientScore(Client client, Point point, Direction dir, int score) {
+                assert(client != null);
+                assert(checkBounds(point));
+                
+                CellImpl cell = getCellImpl(point);
+
+                cell.setContents(client);
+                clientMap.put(client, new DirectedPoint(point, dir));
+                client.registerMaze(this);
+                client.addClientListener(this);
+                update();
+                notifyClientAddScore(client, score);
+        }
         
         /* Internals */
         
@@ -478,10 +492,11 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                         point = new Point(randomGen.nextInt(maxX),randomGen.nextInt(maxY));
                         cell = getCellImpl(point);
                 }
-                Direction d = Direction.random();
-                while(cell.isWall(d)) {
-                        d = Direction.random();
-                }
+                //Direction d = Direction.random();
+                //while(cell.isWall(d)) {
+		//       d = Direction.random();
+                //}
+		Direction d = new Direction("North");
                 cell.setContents(target);
                 clientMap.put(target, new DirectedPoint(point, d));
                 update();
@@ -621,6 +636,25 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                         ml.clientAdded(c);
                 } 
         }
+
+    private void notifyClientAddScore(Client c, int score) {
+                assert(c != null);
+                Iterator i = listenerSet.iterator();
+                while (i.hasNext()) {
+                        Object o = i.next();
+                        assert(o instanceof MazeListener);
+			if (o instanceof ScoreTableModel){
+			    ScoreTableModel sm = (ScoreTableModel)o;
+			    sm.clientAdded(c, score);
+			}
+			else{
+			    MazeListener ml = (MazeListener)o;
+			    ml.clientAdded(c);
+			}
+
+                } 
+        }
+
         
         /**
          * Generate a notification to listeners that a 

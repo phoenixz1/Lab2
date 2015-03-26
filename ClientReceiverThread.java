@@ -12,7 +12,8 @@ public class ClientReceiverThread extends Thread {
 	public ObjectOutputStream outStream;
 	private LinkedBlockingQueue<MazewarPacket> inQueue;
         public boolean isRunning = true;
-
+        private static int ricounter = 0;
+    
 	public ClientReceiverThread (Socket socket, LinkedBlockingQueue<MazewarPacket> incomingQueue) 
 	{
 		super("ClientReceiverThread");
@@ -44,10 +45,9 @@ public class ClientReceiverThread extends Thread {
 	public void run() {
 		
 	    MazewarPacket packetFromServer;
-	    int ricounter = 0;
 	    try {
 		while (isRunning && ((packetFromServer = (MazewarPacket) inStream.readObject()) != null)) {
-			if(packetFromServer.type != MazewarPacket.RING_TOKEN)
+			if(packetFromServer.type != MazewarPacket.RING_TOKEN && packetFromServer.type != MazewarPacket.MW_TICK)
 		    System.out.println("receives a packet of type "+packetFromServer.type + " from " +packetFromServer.cID);
 		    // check acks and unpauses; ACK and RING_UNPAUSE packets are not queued
 		    //synchronized(this) {
@@ -75,7 +75,7 @@ public class ClientReceiverThread extends Thread {
 			}
 		    	else { 
 				inQueue.put(packetFromServer);
-				System.out.println("queued packet. Queue size = "+LocalClient.inQueue.size());
+				//System.out.println("queued packet. Queue size = "+LocalClient.inQueue.size());
                     	}
 		}
 		//Close the streams and socket

@@ -111,6 +111,8 @@ public abstract class Maze {
      */
     public abstract void addRemoteClient(Client client, Point point, Direction dir);
 
+    public abstract void addRemoteClientScore(Client client, Point point, Direction dir, int score);
+
     public abstract void missiletick();
     
     /* Maze Listeners ******************************************************/

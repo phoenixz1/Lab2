@@ -18,11 +18,6 @@ public class ClientExecutionThread extends Thread {
 
 	// ***Lab3*** map containing connections to all clients
 	public  Map<String, SocketInfo> clientsconn;
-
-
-
-	
-	
 	
 	public ClientExecutionThread (LinkedBlockingQueue<MazewarPacket> _inQueue, LinkedBlockingQueue<MazewarPacket> _outQueue, Map<String, Client> clients, String localID,  Map<String, SocketInfo> clientsconn,boolean ispaused, int ACKnum) 
 	{
@@ -64,7 +59,7 @@ public class ClientExecutionThread extends Thread {
 				}
 			}
 		}
-    }
+	}
 	
 	public void executePacket(MazewarPacket pkt) {
 	
@@ -192,7 +187,7 @@ public class ClientExecutionThread extends Thread {
 
 			//players.put(pkt.cID, newClient);
 			LocalClient.clients.put(pkt.cID, newClient);
-			c.maze.addRemoteClient(newClient, pkt.StartPoint, new Direction(pkt.dir));
+			c.maze.addRemoteClientScore(newClient, pkt.StartPoint, new Direction(pkt.dir), pkt.score);
 			
 		}
 		else if(pkt.type == MazewarPacket.RING_PAUSE) { //non-leader clients get this
@@ -213,16 +208,16 @@ public class ClientExecutionThread extends Thread {
 
 				}
 			
-				//ack to leader
+				//ack to new
 				MazewarPacket ackpkt = new MazewarPacket();
 				ackpkt.type = MazewarPacket.RING_INFO;
 				ackpkt.cID = localID;
 				//c = players.get(localID);
 				c = LocalClient.clients.get(localID);
-				ackpkt.score = clientMap.
 				ackpkt.StartPoint = c.getPoint();
 		       		ackpkt.dir = c.getOrientation().toString();
 				ackpkt.leader = pkt.leader;
+				ackpkt.score = LocalClient.scoreModel.getScore(c);
 
 				System.out.println("sending ack to " + pkt.cID);
 				LocalClient.p2pthreads.get(pkt.cID).send(ackpkt);
@@ -316,10 +311,9 @@ public class ClientExecutionThread extends Thread {
 				// Spacebar fires.
 				} else if(e.getKeyCode() == KeyEvent.VK_SPACE) {
 				        localClient.fire();
-				} else if (outPacket.type == MazewarPacket.MW_BYE){
-				    Thread.sleep(5000);
-			            
-				    Mazewar.quit();
+				} else if (outPacket.type == MazewarPacket.MW_BYE){			            
+				    //Mazewar.quit();
+				    System.exit(1);
 				}
 			}
 

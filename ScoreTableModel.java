@@ -64,6 +64,11 @@ public class ScoreTableModel implements TableModel, MazeListener {
                 public ScoreWrapper(Client client) {
                         this.client = client;
                 }
+	    
+	        public ScoreWrapper(Client client, int iScore){
+		    this.client = client;
+		    this.score = iScore;
+	        }
         
                 public Client getClient() {
                         return client;
@@ -76,10 +81,6 @@ public class ScoreTableModel implements TableModel, MazeListener {
                 public void adjustScore(int mod) {
                         score = score + mod;
                 }
-
-		public void setScore(int mod){
-			score = mod;
-		}
                 
                 public int compareTo(Object o) {
                         assert(o instanceof ScoreWrapper);
@@ -199,6 +200,14 @@ public class ScoreTableModel implements TableModel, MazeListener {
                 scoreSet.add(s);
                 clientMap.put(client, s);
                 notifyListeners();
+        }
+
+        public void clientAdded(Client client, int score) {
+                assert(client != null);
+                ScoreWrapper s = new ScoreWrapper(client, score);  
+                scoreSet.add(s);
+                clientMap.put(client, s);
+                notifyListeners();
         } 
         
         public void clientFired(Client client) {
@@ -239,12 +248,6 @@ public class ScoreTableModel implements TableModel, MazeListener {
                 notifyListeners();
         }
 
-	public void setScore(Client client,int score){
-		Object o = clientMap.get(client);
-                assert(o instanceof ScoreWrapper);
-		o.setScore(score);
-	}
-
         private void notifyListeners() {
                 Iterator i = listenerSet.iterator();
                 while (i.hasNext()) {
@@ -253,5 +256,14 @@ public class ScoreTableModel implements TableModel, MazeListener {
                         TableModelListener tml = (TableModelListener)o;
                         tml.tableChanged(new TableModelEvent(this));
                 } 
+        }
+
+        public int getScore(Client client){
+	        assert(client != null);
+                Object o = clientMap.get(client);
+                assert(o instanceof ScoreWrapper);
+                ScoreWrapper s = (ScoreWrapper)o;
+		
+		return s.getScore();
         }
 }

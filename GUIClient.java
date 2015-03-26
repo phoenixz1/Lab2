@@ -33,8 +33,8 @@ public class GUIClient extends LocalClient implements KeyListener {
         /**
          * Create a GUI controlled {@link LocalClient}.  
          */
-        public GUIClient(String name, int ctype, String hostname, int port) {
-                super(name, ctype, hostname, port);
+        public GUIClient(String name, int ctype, String hostname, int port, ScoreTableModel model) {
+	    super(name, ctype, hostname, port, model);
         }
         
         /**
